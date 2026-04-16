@@ -6,7 +6,7 @@
     "watch:local": "node build/watch.js",
     "watch:remote": "bitburner-filesync",
     "watch:init": "node build/init.js",
-    "watch:all": "concurrently --kill-others --success first npm:watch:transpile npm:watch:local npm:watch:remote",
+    "watch:all": "concurrently npm:watch:transpile npm:watch:local npm:watch:remote",
     "watch": "npm run watch:init && npm run watch:all"
   },
   "author": "hydroflame, Hoekstraa, based on work by SlyCedix",
