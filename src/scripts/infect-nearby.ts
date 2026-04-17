@@ -1,50 +1,58 @@
-import { NS, Server } from '@ns'
+import { NS } from '@ns'
 import { Infector } from './services/infector'
 import { Executor, RunArgs } from './services/executor'
+import { logExeInfo } from './utils/log-exe-info'
+import { Logger } from './utils/logger'
 
-// Attempt to gain access to neigboring servers and then execute weaken or grow on the target server.
-// Avoids servers that are already running scripts
+/**
+ * This script attempts to gain access to servers neighboring the host running
+ * it. Once access is gained it will then execute the provided action against the
+ * targeted server.
+ *
+ * NOTE: The host running this script will never execute the provided action. It
+ * only delegates the execution to neighboring servers.
+ *
+ * @param ns
+ */
 export const main = async (ns: NS) => {
     const target = ns.args[0] as string
     const action = ns.args[1] as string
     const count = ns.args[2] as number
-    const host = ns.getHostname()
+    const logger = Logger.Builder.setLogFn(ns.print)
+        .setTerminalLogFn(ns.tprint)
+        .build()
 
-    ns.tprint(`Looking to [${action}] with (x${count} servers) => [${target}]`)
+    logExeInfo(ns)
 
-    const serversToInfect: Server[] = []
+    logger.info(
+        `Looking to execute [${action}] with x${count} server(s) targeting [${target}].`
+    )
 
-    if (count === 1) {
-        serversToInfect.push(ns.getServer(host))
-    } else {
-        serversToInfect.concat(
-            ns
-                .scan()
-                .map((host) => {
-                    const server = ns.getServer(host)
-                    const isRunningScripts = ns.ps(host).length > 0
+    const serversToInfect = ns
+        .scan()
+        .map((serverName) => {
+            const isRunningScripts = ns.ps(serverName).length > 0
+            logger.info(`Found server [${serverName}].`)
 
-                    if (server.hostname === 'home') {
-                        ns.print(`skipped ${host}, cannot infect home`)
-                        return null
-                    }
+            if (serverName === 'home') {
+                logger.warn(`Ignoring [${serverName}], cannot infect home.`)
+                return null
+            }
 
-                    if (isRunningScripts) {
-                        ns.print(`skipped ${host}, already running scripts`)
-                        return null
-                    }
+            if (isRunningScripts) {
+                logger.warn(
+                    `Ignoring [${serverName}], already running scripts.`
+                )
+                return null
+            }
 
-                    return server
-                })
-                .filter((server) => server !== null)
-                .slice(0, count - 1)
-        )
+            return ns.getServer(serverName)
+        })
+        .filter((server) => server !== null)
+        .slice(0, count)
 
-        serversToInfect.push(ns.getServer(ns.getHostname()))
-    }
-
-    ns.print(
-        `Servers to infect: [${serversToInfect.map((server) => server.hostname).join(', ')}]`
+    logger.success(
+        `Neighboring servers: [${serversToInfect.map((server) => server.hostname).join(', ')}].`
     )
 
     for (const server of serversToInfect) {
@@ -53,12 +61,12 @@ export const main = async (ns: NS) => {
                 new Infector(ns).infect(server)
             }
 
-            ns.print(
-                `Executing action [${action}] on host [${server.hostname}] targeting [${target}]`
+            logger.info(
+                `Executing action [${action}] on host [${server.hostname}] targeting [${target}].`
             )
             new Executor(ns).run([server.hostname, target, action] as RunArgs)
-        } catch {
-            ns.print(`Failed to infect ${server.hostname}`)
+        } catch (error) {
+            logger.error(`Failed to infect ${server.hostname}`, error)
         }
     }
 }

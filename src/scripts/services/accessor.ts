@@ -25,7 +25,7 @@ export class Accessor {
     }
 
     public getRootAccess = () => {
-        this.logger.info(`Gaining root access on: ${this.target}`)
+        this.logger.info(`Gaining root access on: ${this.target}.`)
 
         // Try to open all possible ports via available programs.
         try {
@@ -54,17 +54,17 @@ export class Accessor {
                 this.ns.sqlinject(this.target)
             }
         } catch (error) {
-            this.logger.error(`Failed to open ports on: ${this.target}`, error)
+            this.logger.error(`Failed to open ports on: ${this.target}.`, error)
         }
 
         // Nuke the server to gain root access.
         try {
             this.logger.info('Running NUKE.exe...')
             this.ns.nuke(this.target)
-            this.logger.info(`Root access gained on: ${this.target}`)
+            this.logger.info(`Root access gained on: ${this.target}.`)
         } catch (error) {
             this.logger.error(
-                `Failed to get root access on: ${this.target}`,
+                `Failed to get root access on: ${this.target}.`,
                 error
             )
         }

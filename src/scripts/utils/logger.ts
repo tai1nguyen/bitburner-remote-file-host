@@ -1,5 +1,5 @@
 type LogFunction = (message: string) => void
-type LogLevel = 'WARN' | 'INFO' | 'ERROR'
+type LogLevel = 'WARN' | 'INFO' | 'ERROR' | 'SUCCESS'
 
 export class Logger {
     private logPrefix: string
@@ -7,7 +7,7 @@ export class Logger {
     private terminalLogFn?: LogFunction
 
     private constructor(
-        logPrefix: string = 'main',
+        logPrefix: string = 'Main',
         logFn: LogFunction,
         terminalLogFn?: LogFunction
     ) {
@@ -15,6 +15,9 @@ export class Logger {
         this.logPrefix = logPrefix
         this.terminalLogFn = terminalLogFn
     }
+
+    public success = (message: string, obj?: unknown) =>
+        this.writeLog('SUCCESS', message, obj)
 
     public info = (message: string, obj?: unknown) =>
         this.writeLog('INFO', message, obj)
@@ -32,7 +35,7 @@ export class Logger {
     ) => {
         const logMessage = `[${this.logPrefix}]: ${message}`
         const stringifiedObject: string | undefined =
-            obj !== undefined ? JSON.stringify(obj, null, 2) : obj
+            this.getStringifiedObject(obj)
 
         const logToWrite = obj
             ? `${logLevel} ${logMessage}\n${stringifiedObject}`
@@ -40,6 +43,14 @@ export class Logger {
 
         this.logFn(logToWrite)
         this.terminalLogFn?.(logToWrite)
+    }
+
+    private getStringifiedObject = (
+        obj: unknown | undefined
+    ): string | undefined => {
+        if (obj === undefined) return obj
+
+        return JSON.stringify(obj, Object.getOwnPropertyNames(obj), 2)
     }
 
     public static get Builder() {
@@ -65,7 +76,7 @@ export class Logger {
         }
 
         /**
-         * Sets the method used for printing to the running script's logs
+         * Sets the method used for printing to the tail logs.
          */
         setLogFn = (logFn: LogFunction) => {
             this.logFn = logFn

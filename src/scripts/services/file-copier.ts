@@ -2,7 +2,8 @@ import { NS } from '@ns'
 import { Logger } from '/scripts/utils/logger'
 
 /**
- * The FileCopier is responsible for copying files to a target server.
+ * The FileCopier is responsible for copying files to a target server. Currently
+ * it only copies the contents of /scripts.
  *
  * @param ns {NS}
  * @param target {string}
@@ -31,17 +32,17 @@ export class FileCopier {
     private copyFilesInDirectory = (targetDirectory: string, host: string) => {
         try {
             this.logger.info(
-                `Copying files from [${host}:${targetDirectory}] to: ${this.target}`
+                `Copying files from ${host}:${targetDirectory} to: ${this.target}.`
             )
             const filesToCopy = this.ns
                 .ls(host, `${targetDirectory}`)
                 .filter((file) => file.endsWith('.js'))
 
-            this.logger.info(`Found ${filesToCopy.length} file(s) to copy`)
+            this.logger.info(`Found ${filesToCopy.length} file(s) to copy.`)
             this.ns.scp(filesToCopy, this.target)
         } catch (error) {
             this.logger.error(
-                `Failed to copy files from [${host}:${targetDirectory}] to: ${this.target}`,
+                `Failed to copy files from ${host}:${targetDirectory} to: ${this.target}.`,
                 error
             )
         }

@@ -1,27 +1,32 @@
 import { NS } from '@ns'
-import { logSysInfo } from './utils/log-sys-info'
+import { logExeInfo } from './utils/log-exe-info'
 import { ThresholdCalculator } from './utils/threshold-calculator'
+import { Logger } from './utils/logger'
 
 export const main = async (ns: NS) => {
-    ns.disableLog('ALL')
     const target = ns.args[0] as string
     const server = ns.getServer(target)
     const thresholder = new ThresholdCalculator(server)
-    const SIX_SECONDS = 6000
+    const logger = Logger.Builder.setLogFn(ns.print).build()
 
-    logSysInfo({ tprint: ns.tprint, server })
-    ns.print('starting harvest loop...')
+    logExeInfo(ns)
+    ns.ui.openTail()
+
+    logger.info('Starting harvest loop...')
 
     while (true) {
+        ns.clearLog()
+
         if (
             thresholder.isAtMoneyThreshold() &&
             thresholder.isAtSecurityThreshold()
         ) {
-            ns.print(`target [${target}] is ready for harvest`)
-            ns.print('harvesting...')
-            await ns.hack(target)
+            logger.success(`[${target}] is ready for harvest.`)
+            logger.info('Harvesting...')
+            logger.success(`Harvested $${await ns.hack(target)}.`)
         } else {
-            await ns.sleep(SIX_SECONDS)
+            logger.info('Waiting for harvest to be ready...')
+            await ns.weaken(target)
         }
     }
 }

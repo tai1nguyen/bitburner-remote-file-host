@@ -1,5 +1,6 @@
 import { NS } from '@ns'
 import { Executor, RunArgs } from '/scripts/services/executor'
+import { logExeInfo } from '/scripts/utils/log-exe-info'
 
 /**
  * This script takes a host server, a script and a target server
@@ -12,5 +13,6 @@ import { Executor, RunArgs } from '/scripts/services/executor'
  * @param args {string[]} - Additional arguments to pass to the script.
  */
 export const main = (ns: NS) => {
+    logExeInfo(ns)
     new Executor(ns).run(ns.args as RunArgs)
 }

@@ -1,6 +1,7 @@
 import { NS } from '@ns'
-import { logSysInfo } from './utils/log-sys-info'
+import { logExeInfo } from './utils/log-exe-info'
 import { ThresholdCalculator } from './utils/threshold-calculator'
+import { Logger } from './utils/logger'
 
 /**
  * This script prepares the target server for harvest by growing
@@ -9,34 +10,32 @@ import { ThresholdCalculator } from './utils/threshold-calculator'
  * @param ns
  */
 export const main = async (ns: NS) => {
-    ns.disableLog('ALL')
     const target = ns.args[0] as string
     const server = ns.getServer(target)
     const thresholder = new ThresholdCalculator(server)
+    const logger = Logger.Builder.setLogFn(ns.print).build()
 
-    logSysInfo({ tprint: ns.tprint, server })
-    ns.tprint('starting grow/weaken loop...')
-    ns.print('starting grow/weaken loop...')
+    logExeInfo(ns)
+    ns.ui.openTail()
+
+    logger.info('Starting grow/weaken loop...')
 
     while (true) {
+        ns.clearLog()
+
         if (thresholder.isAtSecurityThreshold()) {
-            ns.print(`target [${target}] is at or below security threshold`)
-            ns.print(`current security level: ${server.hackDifficulty}`)
-            ns.print(
-                `security target level: ${thresholder.getTargetSecurityThreshold()}`
-            )
+            logger.success(`[${target}] is at or below security threshold`)
         } else {
-            ns.print('weakening...')
+            logger.info(`Weakening [${target}]...`)
             await ns.weaken(target)
         }
 
         if (thresholder.isAtMoneyThreshold()) {
-            ns.print(`target [${target}] is ready for harvest`)
-            ns.print(`current money: ${server.moneyAvailable}`)
-            ns.print(`target money: ${thresholder.getTargetMoneyThreshold()}`)
+            logger.success(`[${target}] is ready for harvest.`)
+            logger.success(`Current money: ${server.moneyAvailable}`)
         }
 
-        ns.print('growing...')
+        logger.info('Growing...')
         await ns.grow(target)
     }
 }

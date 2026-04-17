@@ -4,8 +4,9 @@ import { FileCopier } from './file-copier'
 import { Logger } from '/scripts/utils/logger'
 
 /**
- * Uses the accessor to gain access to the target server
- * then copies all files in the scripts directory over with the file copier..
+ * This service attempts to gain root access to the target server. Once access
+ * is attained it then copies over scripts to prepare the server for
+ * further actions.
  *
  * @param ns {NS}
  */
@@ -35,9 +36,9 @@ export class Infector {
 
             fileCopier.copyScriptFiles()
 
-            this.logger.info(`Successfully infected ${server.hostname}`)
+            this.logger.info(`Successfully infected ${server.hostname}.`)
         } catch (error) {
-            this.logger.error(`Failed to infect ${server.hostname}`, error)
+            this.logger.error(`Failed to infect ${server.hostname}:`, error)
         }
     }
 }
