@@ -5,7 +5,7 @@ import { FileCopier } from './file-copier'
 /**
  * Uses the accessor to gain access to the target server
  * then copies all files in the scripts directory over with the file copier..
- * 
+ *
  * @param ns {NS}
  */
 export class Infector {

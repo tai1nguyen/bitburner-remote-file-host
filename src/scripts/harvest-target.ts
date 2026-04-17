@@ -13,7 +13,10 @@ export const main = async (ns: NS) => {
     ns.print('starting harvest loop...')
 
     while (true) {
-        if (thresholder.isAtMoneyThreshold() && thresholder.isAtSecurityThreshold()) {
+        if (
+            thresholder.isAtMoneyThreshold() &&
+            thresholder.isAtSecurityThreshold()
+        ) {
             ns.print(`target [${target}] is ready for harvest`)
             ns.print('harvesting...')
             await ns.hack(target)

@@ -3,7 +3,7 @@ import { NS } from '@ns'
 /**
  * The Accessor is responsible for gaining root access on a target
  * server by using any available port-opening programs.
- * 
+ *
  * @param ns {NS}
  * @param target {string}
  */

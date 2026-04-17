@@ -1,0 +1,4 @@
+dist/
+build/
+package-lock.json
+NetscriptDefinitions.d.ts

@@ -16,30 +16,35 @@ export const main = async (ns: NS) => {
     if (count === 1) {
         serversToInfect.push(ns.getServer(ns.getHostname()))
     } else {
-        serversToInfect.concat(ns.scan()
-            .map(host => {
-                const server = ns.getServer(host)
-                const isRunningScripts = ns.ps(host).length > 0
+        serversToInfect.concat(
+            ns
+                .scan()
+                .map((host) => {
+                    const server = ns.getServer(host)
+                    const isRunningScripts = ns.ps(host).length > 0
 
-                if (server.hostname === 'home') {
-                    ns.print(`skipped ${host}, cannot infect home`)
-                    return null
-                }
+                    if (server.hostname === 'home') {
+                        ns.print(`skipped ${host}, cannot infect home`)
+                        return null
+                    }
 
-                if (isRunningScripts) {
-                    ns.print(`skipped ${host}, already running scripts`)
-                    return null
-                }
+                    if (isRunningScripts) {
+                        ns.print(`skipped ${host}, already running scripts`)
+                        return null
+                    }
 
-                return server
-            })
-            .filter((server) => server !== null)
-            .slice(0, count - 1))
+                    return server
+                })
+                .filter((server) => server !== null)
+                .slice(0, count - 1)
+        )
 
         serversToInfect.push(ns.getServer(ns.getHostname()))
     }
 
-    ns.print(`Servers to infect: [${serversToInfect.map(server => server.hostname).join(', ')}]`)
+    ns.print(
+        `Servers to infect: [${serversToInfect.map((server) => server.hostname).join(', ')}]`
+    )
 
     for (const server of serversToInfect) {
         try {

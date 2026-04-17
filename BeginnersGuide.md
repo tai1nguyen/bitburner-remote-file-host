@@ -19,17 +19,17 @@ If you need help with your particular system, feel free to ask for help in the O
 - Go to https://github.com/bitburner-official/typescript-template
 - Click the green 'Code' button
 - If you're unfamiliar with Git and have no intention to use it:
-  - Press the Download Zip button
-  - Extract the zip anywhere, for example `C:\Users\yourusername\Workspace\BitburnerScripts` on Windows or `~/Workspace/BitburnerScripts` on Other
+    - Press the Download Zip button
+    - Extract the zip anywhere, for example `C:\Users\yourusername\Workspace\BitburnerScripts` on Windows or `~/Workspace/BitburnerScripts` on Other
 
 ### 4. Open a terminal pointed at your scripts folder
 
 - Open command prompt / terminal
-  - Windows: Open start menu and type `cmd` (enter)
-  - Mac: Click the Launchpad icon in the Dock, type `Terminal` in the search field, then click Terminal.
+    - Windows: Open start menu and type `cmd` (enter)
+    - Mac: Click the Launchpad icon in the Dock, type `Terminal` in the search field, then click Terminal.
 - To go to the directory you just created:
-  - Windows: Type `cd ` and drag the folder you created to the cmd window, or type `cd C:\Users\yourusername\Workspace\BitburnerScripts` or whatever folder you chose previously.
-  - Mac: Type `cd ` and drag the folder you created to the terminal window, or type `cd ~/Workspace/BitburnerScripts` or whatever folder you chose previously.
+    - Windows: Type `cd ` and drag the folder you created to the cmd window, or type `cd C:\Users\yourusername\Workspace\BitburnerScripts` or whatever folder you chose previously.
+    - Mac: Type `cd ` and drag the folder you created to the terminal window, or type `cd ~/Workspace/BitburnerScripts` or whatever folder you chose previously.
 
 ### 5. Install the needed programs
 

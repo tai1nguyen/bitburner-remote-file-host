@@ -60,19 +60,19 @@ To ensure both the game and typescript have no issues with import paths, your im
 To import `helperFunction` from the file `helpers.ts` located in the directory `src/lib/`:
 
 ```js
-import { helperFunction } from "lib/helpers";
+import { helperFunction } from 'lib/helpers'
 ```
 
 To import all functions from the file `helpers.ts` located in the `src/lib/` directory as the namespace `helpers`:
 
 ```js
-import * as helpers from "lib/helpers";
+import * as helpers from 'lib/helpers'
 ```
 
 To import `someFunction` from the file `main.ts` located in the `src/` directory:
 
 ```js
-import { someFunction } from "main";
+import { someFunction } from 'main'
 ```
 
 ### Debugging

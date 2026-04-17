@@ -5,8 +5,8 @@ import { ThresholdCalculator } from './utils/threshold-calculator'
 /**
  * This script prepares the target server for harvest by growing
  * its money and weakening its security.
- * 
- * @param ns 
+ *
+ * @param ns
  */
 export const main = async (ns: NS) => {
     ns.disableLog('ALL')
@@ -22,7 +22,9 @@ export const main = async (ns: NS) => {
         if (thresholder.isAtSecurityThreshold()) {
             ns.print(`target [${target}] is at or below security threshold`)
             ns.print(`current security level: ${server.hackDifficulty}`)
-            ns.print(`security target level: ${thresholder.getTargetSecurityThreshold()}`)
+            ns.print(
+                `security target level: ${thresholder.getTargetSecurityThreshold()}`
+            )
         } else {
             ns.print('weakening...')
             await ns.weaken(target)

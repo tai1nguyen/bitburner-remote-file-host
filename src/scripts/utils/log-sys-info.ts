@@ -1,6 +1,12 @@
 import { Server } from '@ns'
 
-export const logSysInfo = ({ tprint, server }: { tprint: (output: string) => void, server: Server }) => {
+export const logSysInfo = ({
+    tprint,
+    server
+}: {
+    tprint: (output: string) => void
+    server: Server
+}) => {
     tprint('------------------------------------')
     tprint('Server Infomation')
     tprint('------------------------------------')
