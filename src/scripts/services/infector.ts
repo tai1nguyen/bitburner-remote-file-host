@@ -1,6 +1,7 @@
 import { NS, Server } from '@ns'
 import { Accessor } from './accessor'
 import { FileCopier } from './file-copier'
+import { Logger } from '/scripts/utils/logger'
 
 /**
  * Uses the accessor to gain access to the target server
@@ -10,14 +11,14 @@ import { FileCopier } from './file-copier'
  */
 export class Infector {
     ns: NS
-    log: (message: string) => void
+    logger: Logger
 
     constructor(ns: NS) {
         this.ns = ns
-        this.log = (message: string) => {
-            this.ns.tprint(`[Infector]: ${message}`)
-            this.ns.print(`[Infector]: ${message}`)
-        }
+        this.logger = Logger.Builder.setLogPrefix('Infector')
+            .setLogFn(ns.print)
+            .setTerminalLogFn(ns.tprint)
+            .build()
 
         ns.disableLog('ALL')
     }
@@ -26,7 +27,7 @@ export class Infector {
         try {
             const fileCopier = new FileCopier(this.ns, server.hostname)
             const accessor = new Accessor(this.ns, server.hostname)
-            this.log(`Infecting ${server.hostname}...`)
+            this.logger.info(`Infecting ${server.hostname}...`)
 
             if (!server.hasAdminRights) {
                 accessor.getRootAccess()
@@ -34,9 +35,9 @@ export class Infector {
 
             fileCopier.copyScriptFiles()
 
-            this.log(`Successfully infected ${server.hostname}`)
-        } catch {
-            this.log(`Failed to infect ${server.hostname}`)
+            this.logger.info(`Successfully infected ${server.hostname}`)
+        } catch (error) {
+            this.logger.error(`Failed to infect ${server.hostname}`, error)
         }
     }
 }

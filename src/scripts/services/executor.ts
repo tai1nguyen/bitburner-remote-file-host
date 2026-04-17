@@ -1,17 +1,18 @@
 import { NS, Server, ScriptArg } from '@ns'
+import { Logger } from '/scripts/utils/logger'
 
 type Options = { host: string; target?: string; threads?: number }
 
-type InfectNearbyOptions = Options & { action: ExecutorActions; count: number }
+type InfectNearbyOptions = Options & { action: ExecutorAction; count: number }
 
 export type RunArgs = [
     host: string,
     target: string,
-    ExecutorActions,
+    ExecutorAction,
     ...ScriptArg[]
 ]
 
-export enum ExecutorActions {
+export enum ExecutorAction {
     grow = 'growTarget',
     harvest = 'harvestTarget',
     infect = 'infectNearby'
@@ -25,14 +26,15 @@ export enum ExecutorActions {
  */
 export class Executor {
     ns: NS
-    log: (message: string) => void
+    logger: Logger
 
     constructor(ns: NS) {
         this.ns = ns
-        this.log = (message: string) => {
-            this.ns.tprint(`[Executor]: ${message}`)
-            this.ns.print(`[Executor]: ${message}`)
-        }
+
+        this.logger = Logger.Builder.setLogPrefix('Executor')
+            .setLogFn(ns.print)
+            .setTerminalLogFn(ns.tprint)
+            .build()
 
         ns.disableLog('ALL')
     }
@@ -46,42 +48,40 @@ export class Executor {
     public run = (args: RunArgs) => {
         const host = args[0]
         const target = args[1] === '.' ? host : args[1]
-        const action: ExecutorActions = this.getAction(args[2])
+        const action: ExecutorAction = this.getAction(args[2])
 
         if (!host || !action || !target) {
-            this.log(
+            this.logger.warn(
                 `Invalid arguments: [${JSON.stringify({ host, action, target })}]`
             )
             return
         }
 
         const isValidInfectArgs = () => {
-            const infectAction = args[3] as ExecutorActions
+            const infectAction = args[3] as ExecutorAction
             const count = Number(args[4])
 
             return infectAction && !isNaN(count)
         }
 
+        // TODO: Copy all local scripts to the host. Ensures
+        // that the host always has the latest scripts to run.
+
         try {
             switch (action) {
-                case ExecutorActions.grow: {
+                case ExecutorAction.grow: {
                     const options: Options = { host, target }
-
-                    this.log(
-                        `Attempting to grow target [${options.target}] from host [${options.host}]...`
-                    )
                     this.growTarget(options)
                     break
                 }
-                case ExecutorActions.harvest: {
+                case ExecutorAction.harvest: {
                     const options: Options = { host, target }
-
                     this.harvestTarget(options)
                     break
                 }
-                case ExecutorActions.infect: {
+                case ExecutorAction.infect: {
                     if (isValidInfectArgs()) {
-                        const infectAction = args[3] as ExecutorActions
+                        const infectAction = args[3] as ExecutorAction
                         const options: InfectNearbyOptions = {
                             host,
                             target,
@@ -89,22 +89,9 @@ export class Executor {
                             count: Number(args[4])
                         }
 
-                        if (options.count > 1) {
-                            this.log(
-                                `Attempting to infect ${options.count} server(s) nearby host [${options.host}]`
-                            )
-                        } else {
-                            this.log(
-                                `Attempting to infect host [${options.host}]`
-                            )
-                        }
-
-                        this.log(
-                            `Infected will execute action [${options.action}] targeting [${options.target}]`
-                        )
                         this.infectNearby(options)
                     } else {
-                        this.log(
+                        this.logger.error(
                             `Invalid arguments for infect action: [${args[3]}, ${args[4]}]`
                         )
                     }
@@ -113,8 +100,9 @@ export class Executor {
                 }
             }
         } catch (error) {
-            this.log(
-                `Error executing action [${action}] on host [${host}] targeting [${target}]: ${error?.toString()}`
+            this.logger.error(
+                `Error executing [${action}] on host [${host}] targeting [${target}]`,
+                error as object
             )
         }
     }
@@ -132,16 +120,18 @@ export class Executor {
             )
         }
 
-        this.log(
+        this.logger.info(
             `Growing ${target} using ${threadsToUse} thread(s) on ${options.host}...`
         )
+
         const pid = this.ns.exec(
             pathToScript,
             options.host,
             threadsToUse,
             target
         )
-        this.log(`Executed with PID: ${pid}`)
+
+        this.logger.info(`Executed with PID: ${pid}`)
     }
 
     public harvestTarget = (options: Options) => {
@@ -157,26 +147,42 @@ export class Executor {
             )
         }
 
-        this.log(
+        this.logger.info(
             `Harvesting ${target} using ${threadsToUse} thread(s) on ${options.host}...`
         )
+
         const pid = this.ns.exec(
             pathToScript,
             options.host,
             threadsToUse,
             target
         )
-        this.log(`Executed with PID: ${pid}`)
+
+        this.logger.info(`Executed with PID: ${pid}`)
     }
 
     public infectNearby = (options: InfectNearbyOptions) => {
-        if (options.action === ExecutorActions.infect) {
+        // TODO: add better handling for when we only want to infect a single server
+
+        if (options.action === ExecutorAction.infect) {
             // When the action to execute is also to infect nearby
             // servers the system will infinitely spawn scripts.)
             throw new Error(
                 `Cannot infect nearby servers with infected action as [${options.action}]`
             )
         }
+
+        if (options.count > 1) {
+            this.logger.info(
+                `Infect ${options.count} server(s) nearby host [${options.host}]...`
+            )
+        } else {
+            this.logger.info(`Infect host [${options.host}]...`)
+        }
+
+        this.logger.info(
+            `Infected servers will execute [${options.action}] targeting [${options.target}]`
+        )
 
         try {
             const pathToScript = '/scripts/infect-nearby.js'
@@ -191,6 +197,8 @@ export class Executor {
                 )
             }
 
+            this.logger.info(`executing infect using ${threadsToUse} threads.`)
+
             const pid = this.ns.exec(
                 pathToScript,
                 options.host,
@@ -199,9 +207,9 @@ export class Executor {
                 options.action,
                 options.count
             )
-            this.log(`Executed with PID: ${pid}`)
+            this.logger.info(`Executed with PID: ${pid}`)
         } catch (error) {
-            this.log(`${error?.toString()}`)
+            this.logger.error(`Failed to execute infect`, error)
         }
     }
 
@@ -209,13 +217,6 @@ export class Executor {
         const ramAvailable = server.maxRam - server.ramUsed
         const ramPerThread = this.ns.getScriptRam(pathToScript)
         const maxThreads = Math.floor(ramAvailable / ramPerThread)
-
-        this.log(
-            `Checking if host [${server.hostname}] can run [${pathToScript}]`
-        )
-        this.log(`Script RAM cost: ${ramPerThread}`)
-        this.log(`Host RAM available: ${ramAvailable}`)
-        this.log(`Max threads available: ${maxThreads}`)
 
         return maxThreads
     }
@@ -227,6 +228,6 @@ export class Executor {
         return minThreads
     }
 
-    private getAction = (action: string): ExecutorActions =>
-        ExecutorActions[action as keyof typeof ExecutorActions]
+    private getAction = (action: string): ExecutorAction =>
+        ExecutorAction[action as keyof typeof ExecutorAction]
 }

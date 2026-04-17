@@ -4,8 +4,6 @@ The official template for synchronizing Typescript/Javascript from your computer
 
 [Step by step install](BeginnersGuide.md)
 
-[Docker install guide](DockerGuide.md) (optional)
-
 [Learn more about Typescript](https://www.typescriptlang.org/docs/)
 
 ## About

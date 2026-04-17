@@ -8,13 +8,14 @@ export const main = async (ns: NS) => {
     const target = ns.args[0] as string
     const action = ns.args[1] as string
     const count = ns.args[2] as number
+    const host = ns.getHostname()
 
-    ns.tprint(`[${action}] (x${count} servers) => [${target}]`)
+    ns.tprint(`Looking to [${action}] with (x${count} servers) => [${target}]`)
 
     const serversToInfect: Server[] = []
 
     if (count === 1) {
-        serversToInfect.push(ns.getServer(ns.getHostname()))
+        serversToInfect.push(ns.getServer(host))
     } else {
         serversToInfect.concat(
             ns
@@ -48,7 +49,13 @@ export const main = async (ns: NS) => {
 
     for (const server of serversToInfect) {
         try {
-            new Infector(ns).infect(server)
+            if (!server.hasAdminRights) {
+                new Infector(ns).infect(server)
+            }
+
+            ns.print(
+                `Executing action [${action}] on host [${server.hostname}] targeting [${target}]`
+            )
             new Executor(ns).run([server.hostname, target, action] as RunArgs)
         } catch {
             ns.print(`Failed to infect ${server.hostname}`)

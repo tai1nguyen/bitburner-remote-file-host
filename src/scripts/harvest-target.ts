@@ -21,7 +21,7 @@ export const main = async (ns: NS) => {
             ns.print('harvesting...')
             await ns.hack(target)
         } else {
-            ns.sleep(SIX_SECONDS)
+            await ns.sleep(SIX_SECONDS)
         }
     }
 }
