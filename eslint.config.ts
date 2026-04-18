@@ -1,9 +1,9 @@
 import eslint from '@eslint/js'
 import tseslint from 'typescript-eslint'
 import eslintConfigPrettier from 'eslint-config-prettier'
-import { defineConfig } from 'eslint/config'
+import { defineConfig, Config } from 'eslint/config'
 
-const config = {
+const config: Config = {
     languageOptions: {
         parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
         globals: { console: 'readonly', process: 'readonly' }
@@ -11,8 +11,12 @@ const config = {
     rules: {
         'func-style': ['error', 'expression'],
         'no-unexpected-multiline': 'error',
+        'require-await': 'warn',
+        // 'no-explicit-any': 'error',
+        // Allow unused variables if they are prefixed with `_`.
+        // Must turn off the rule in eslint and override
+        // the one from typescript-eslint.
         'no-unused-vars': 'off',
-        // override rule from typescript-eslint.
         '@typescript-eslint/no-unused-vars': [
             'error',
             {
@@ -20,7 +24,8 @@ const config = {
                 varsIgnorePattern: '^_',
                 caughtErrorsIgnorePattern: '^_'
             }
-        ]
+        ],
+        '@typescript-eslint/no-explicit-any': 'warn'
     }
 }
 
