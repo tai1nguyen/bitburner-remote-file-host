@@ -1,18 +1,18 @@
 import { NS } from '@ns'
 import { Logger } from '/scripts/utils/logger'
 
-/**
- * The Accessor is responsible for gaining root access on a target
- * server by using any available port-opening programs.
- *
- * @param ns {NS}
- * @param target {string}
- */
 export class Accessor {
     ns: NS
     target: string
     logger: Logger
 
+    /**
+     * The Accessor is responsible for gaining root access on a target
+     * server by using any available port-opening programs.
+     *
+     * @param ns {NS}
+     * @param target {string}
+     */
     constructor(ns: NS, target: string) {
         this.ns = ns
         this.target = target
@@ -67,6 +67,8 @@ export class Accessor {
                 `Failed to get root access on: ${this.target}.`,
                 error
             )
+
+            throw error
         }
     }
 }

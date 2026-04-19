@@ -1,19 +1,19 @@
 import { NS } from '@ns'
 import { Logger } from '/scripts/utils/logger'
 
-/**
- * The FileCopier is responsible for copying files to a target server. Currently
- * it only copies the contents of /scripts.
- *
- * @param ns {NS}
- * @param target {string}
- */
 export class FileCopier {
     ns: NS
     target: string
     logger: Logger
     baseDirectory: string = 'scripts'
 
+    /**
+     * The FileCopier is responsible for copying files to a target server. Currently
+     * it only copies the contents of /scripts.
+     *
+     * @param ns {NS}
+     * @param target {string}
+     */
     constructor(ns: NS, target: string) {
         this.ns = ns
         this.target = target

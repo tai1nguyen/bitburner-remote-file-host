@@ -4,8 +4,6 @@ import { FileCopier } from './file-copier'
 
 type Options = { host: string; target?: string; threads?: number }
 
-type InfectNearbyOptions = Options & { action: ExecutorAction; count: number }
-
 export type RunArgs = [
     host: string,
     target: string,
@@ -15,21 +13,20 @@ export type RunArgs = [
 
 export enum ExecutorAction {
     grow = 'growTarget',
-    harvest = 'harvestTarget',
-    infect = 'infectNearby'
+    harvest = 'harvestTarget'
 }
 
-/**
- * The Executor is responsible for running scripts on the provided host
- * server. It holds all the necessary logic to determine what scripts
- * to run and how to run them.
- *
- * @param ns {NS}
- */
 export class Executor {
     ns: NS
     logger: Logger
 
+    /**
+     * The Executor is responsible for running scripts on the provided host
+     * server. It holds all the necessary logic to determine what scripts
+     * to run and how to run them.
+     *
+     * @param ns {NS}
+     */
     constructor(ns: NS) {
         this.ns = ns
 
@@ -59,15 +56,10 @@ export class Executor {
             return
         }
 
-        const isValidInfectArgs = () => {
-            const infectAction = args[3] as ExecutorAction
-            const count = Number(args[4])
-
-            return infectAction && !isNaN(count)
-        }
-
         try {
-            this.logger.info(`Updating files on ${host}.`)
+            this.logger.info(
+                `Updating files on ${host === target ? host : target}.`
+            )
             new FileCopier(this.ns, target).copyScriptFiles()
 
             switch (action) {
@@ -81,25 +73,6 @@ export class Executor {
                     this.harvestTarget(options)
                     break
                 }
-                case ExecutorAction.infect: {
-                    if (isValidInfectArgs()) {
-                        const infectAction = args[3] as ExecutorAction
-                        const options: InfectNearbyOptions = {
-                            host,
-                            target,
-                            action: infectAction,
-                            count: Number(args[4])
-                        }
-
-                        this.infectNearby(options)
-                    } else {
-                        throw new Error(
-                            `Invalid arguments for infect: [{ infectAction: ${args[3]}, count: ${args[4]} }].`
-                        )
-                    }
-
-                    break
-                }
             }
         } catch (error) {
             this.logger.error(
@@ -109,7 +82,7 @@ export class Executor {
         }
     }
 
-    public growTarget = (options: Options) => {
+    public growTarget = (options: Options): number => {
         const pathToScript = '/scripts/grow-target.js'
         const hostServer = this.ns.getServer(options.host)
         const target = options.target || hostServer.hostname
@@ -134,9 +107,11 @@ export class Executor {
         )
 
         this.logger.info(`Executed with PID: ${pid}`)
+
+        return pid
     }
 
-    public harvestTarget = (options: Options) => {
+    public harvestTarget = (options: Options): number => {
         const pathToScript = '/scripts/harvest-target.js'
         const hostServer = this.ns.getServer(options.host)
         const target = options.target || hostServer.hostname
@@ -161,53 +136,8 @@ export class Executor {
         )
 
         this.logger.info(`Executed with PID: ${pid}`)
-    }
 
-    public infectNearby = (options: InfectNearbyOptions) => {
-        if (options.action === ExecutorAction.infect) {
-            // When the action to execute is also to infect nearby
-            // servers the system will infinitely spawn scripts.)
-            throw new Error(
-                `Cannot infect nearby servers with infected action as [${options.action}].`
-            )
-        }
-
-        this.logger.info(
-            `Infecting ${options.count} server(s) near host ${options.host}.`
-        )
-        this.logger.info(
-            `Infected servers will execute [${options.action}] targeting [${options.target}].`
-        )
-
-        try {
-            const pathToScript = '/scripts/infect-nearby.js'
-            const hostServer = this.ns.getServer(options.host)
-            const target = options.target || hostServer.hostname
-            const threadsToUse =
-                options.threads || this.getMinThreads(hostServer, pathToScript)
-
-            if (threadsToUse <= 0) {
-                throw new Error(
-                    `Not enough threads available on ${options.host} to infect nearby servers...`
-                )
-            }
-
-            this.logger.info(
-                `Infecting ${options.count} server(s) nearby ${options.host} using ${threadsToUse} thread(s).`
-            )
-
-            const pid = this.ns.exec(
-                pathToScript,
-                options.host,
-                threadsToUse,
-                target,
-                options.action,
-                options.count
-            )
-            this.logger.info(`Executed with PID: ${pid}`)
-        } catch (error) {
-            this.logger.error(`Failed to execute infect:`, error)
-        }
+        return pid
     }
 
     private getMaxThreads = (server: Server, pathToScript: string): number => {

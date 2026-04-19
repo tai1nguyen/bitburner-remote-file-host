@@ -3,17 +3,17 @@ import { Accessor } from './accessor'
 import { FileCopier } from './file-copier'
 import { Logger } from '/scripts/utils/logger'
 
-/**
- * This service attempts to gain root access to the target server. Once access
- * is attained it then copies over scripts to prepare the server for
- * further actions.
- *
- * @param ns {NS}
- */
 export class Infector {
     ns: NS
     logger: Logger
 
+    /**
+     * This service attempts to gain root access to the target server. Once access
+     * is attained it then copies over scripts to prepare the server for
+     * further actions.
+     *
+     * @param ns {NS}
+     */
     constructor(ns: NS) {
         this.ns = ns
         this.logger = Logger.Builder.setLogPrefix('Infector')
@@ -39,6 +39,7 @@ export class Infector {
             this.logger.info(`Successfully infected ${server.hostname}.`)
         } catch (error) {
             this.logger.error(`Failed to infect ${server.hostname}:`, error)
+            throw error
         }
     }
 }
