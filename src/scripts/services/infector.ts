@@ -38,8 +38,10 @@ export class Infector {
 
             this.logger.info(`Successfully infected ${server.hostname}.`)
         } catch (error) {
-            this.logger.error(`Failed to infect ${server.hostname}:`, error)
-            throw error
+            this.logger.error(`Failed to infect ${server.hostname}`)
+            throw new Error(`Failed to infect ${server.hostname}`, {
+                cause: error
+            })
         }
     }
 }

@@ -30,22 +30,26 @@ export const main = async (ns: NS) => {
     // Tell all servers to grow the target.
     logger.info(`Directing all servers to grow/weaken ${largestServer}...`)
 
-    servers.forEach((host) => {
-        logger.warn(`[${host}] to grow [${largestServer}].`)
-        executor.growTarget({ host, target: largestServer })
-    })
+    try {
+        for (const host of servers) {
+            await ns.sleep(1000)
+            executor.growTarget({ host, target: largestServer })
+        }
 
-    logger.warn('Entering harvest loop...')
+        logger.info('Entering harvest loop...')
 
-    executor.growTarget({
-        host: 'home',
-        target: ns.getServer(largestServer).hostname,
-        threads: 40
-    })
+        executor.growTarget({
+            host: 'home',
+            target: ns.getServer(largestServer).hostname,
+            threads: 40
+        })
 
-    executor.harvestTarget({
-        host: 'home',
-        target: ns.getServer(largestServer).hostname,
-        threads: 40
-    })
+        executor.harvestTarget({
+            host: 'home',
+            target: ns.getServer(largestServer).hostname,
+            threads: 40
+        })
+    } catch (error) {
+        logger.error(`Failed to coordinate grow on ${largestServer}.`, error)
+    }
 }

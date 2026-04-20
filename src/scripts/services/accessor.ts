@@ -63,12 +63,11 @@ export class Accessor {
             this.ns.nuke(this.target)
             this.logger.info(`Root access gained on: ${this.target}.`)
         } catch (error) {
-            this.logger.error(
-                `Failed to get root access on: ${this.target}.`,
-                error
-            )
+            this.logger.error(`Failed to get root access on: ${this.target}.`)
 
-            throw error
+            throw new Error(`Failed to get root access on: ${this.target}.`, {
+                cause: error
+            })
         }
     }
 }

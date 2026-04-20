@@ -84,7 +84,7 @@ describe('Accessor', () => {
             expect(
                 new Accessor(Mocks.Netscript as unknown as NS, 'target')
                     .getRootAccess
-            ).toThrow('Failed to nuke')
+            ).toThrow('Failed to get root access on: target.')
         })
     })
 })
