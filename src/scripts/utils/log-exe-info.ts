@@ -13,4 +13,5 @@ export const logExeInfo = (ns: NS) => {
     logger.info(`Host: ${ns.getHostname()}`)
     logger.info(`Running script: ${ns.getScriptName()}`)
     logger.info('------------------------------------')
+    logger.info('')
 }

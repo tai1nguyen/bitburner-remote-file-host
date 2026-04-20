@@ -1,3 +1,5 @@
+import { formatErrorStack } from './format-error-stack'
+
 type LogFunction = (message: string) => void
 type LogLevel = 'WARN' | 'INFO' | 'ERROR' | 'SUCCESS'
 
@@ -48,7 +50,12 @@ export class Logger {
     private getStringifiedObject = (
         obj: unknown | undefined
     ): string | undefined => {
+        // bitburner errors are strings
+        const isError = obj instanceof Error || typeof obj === 'string'
+
         if (obj === undefined) return obj
+
+        if (isError) return formatErrorStack(obj)
 
         return JSON.stringify(obj, Object.getOwnPropertyNames(obj), 2)
     }

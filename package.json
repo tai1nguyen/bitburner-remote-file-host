@@ -8,13 +8,14 @@
         "watch:init": "node build/init.js && npx tsc",
         "watch:all": "concurrently npm:watch:transpile npm:watch:local npm:watch:remote",
         "watch": "npm run watch:init && npm run watch:all",
-        "test": "vitest run"
+        "test": "vitest run --coverage"
     },
     "author": "hydroflame, Hoekstraa, based on work by SlyCedix",
     "devDependencies": {
         "@eslint/js": "^10.0.1",
         "@types/react": "^18.2.18",
         "@types/react-dom": "^18.2.7",
+        "@vitest/coverage-v8": "^4.1.4",
         "bitburner-filesync": "^1.1.5",
         "chokidar": "^3.5.3",
         "concurrently": "^7.4.0",

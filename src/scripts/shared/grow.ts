@@ -3,7 +3,7 @@ import { ThresholdCalculator } from '/scripts/utils/threshold-calculator'
 import { Logger } from '/scripts/utils/logger'
 
 // Each call to ns.grow will increase both server money and security
-// level. Therefore,. ns.weaken must be call after each grow to
+// level. Therefore, ns.weaken must be call after each grow cycle to
 // counter act this side effect.
 export const grow = async (ns: NS, target: string) => {
     const server: Server = ns.getServer(target)

@@ -1,3 +1,4 @@
-import { MockExecutor } from './scripts/services/mock-executor'
+import { Executor } from './scripts/services/executor.mock'
+import { Netscript } from './globals/netscript.mock'
 
-export default { Executor: MockExecutor }
+export default { Netscript, Executor }

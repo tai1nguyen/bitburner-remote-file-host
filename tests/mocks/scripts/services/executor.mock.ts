@@ -1,6 +1,6 @@
 import { vi } from 'vitest'
 
-export const MockExecutor = {
+export const Executor = {
     Executor: vi.fn(
         class {
             constructor() {}
