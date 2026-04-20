@@ -148,13 +148,6 @@ export class Executor {
         return maxThreads
     }
 
-    private getMinThreads = (server: Server, pathToScript: string): number => {
-        const maxThreads = this.getMaxThreads(server, pathToScript)
-        const minThreads = maxThreads >= 1 ? 1 : 0
-
-        return minThreads
-    }
-
     private getAction = (action: string): ExecutorAction =>
         ExecutorAction[action as keyof typeof ExecutorAction]
 }

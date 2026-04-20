@@ -7,19 +7,20 @@ export class ThresholdCalculator {
         this.server = server
     }
 
-    getServer = () => this.server
+    public getServer = () => this.server
 
-    getTargetMoneyThreshold = () => (this.server.moneyMax || 0) * 0.8
-
-    getTargetSecurityThreshold = () => (this.server.minDifficulty || 0) + 0.5
-
-    isAtMoneyThreshold = () => {
+    public isAtMoneyThreshold = () => {
         const targetThreshold = this.getTargetMoneyThreshold()
         return (this.server.moneyAvailable || 0) >= targetThreshold
     }
 
-    isAtSecurityThreshold = () => {
+    public isAtSecurityThreshold = () => {
         const targetSecurityThreshold = this.getTargetSecurityThreshold()
         return (this.server.hackDifficulty || 0) <= targetSecurityThreshold
     }
+
+    private getTargetMoneyThreshold = () => (this.server.moneyMax || 0) * 0.8
+
+    private getTargetSecurityThreshold = () =>
+        (this.server.minDifficulty || 0) + 0.5
 }
