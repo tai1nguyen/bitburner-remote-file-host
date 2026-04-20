@@ -9,6 +9,9 @@ export const Netscript = {
     tprint: vi.fn(),
     clearLog: vi.fn(),
     fileExists: vi.fn(),
+    getServer: vi.fn(),
+    ls: vi.fn(),
+    scp: vi.fn(),
 
     // port openers
     brutessh: vi.fn(),

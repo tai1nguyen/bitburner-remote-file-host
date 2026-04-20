@@ -50,6 +50,7 @@ export const main = (ns: NS) => {
     logger.warn(`Backdoored: ${server.backdoorInstalled}`)
     logger.warn(`Required Open Ports: ${server.numOpenPortsRequired}`)
     logger.warn(`Ports Currently Open: ${server.openPortCount}`)
+    logger.warn('')
     logger.warn('------------------------------------')
     logger.warn('')
 }

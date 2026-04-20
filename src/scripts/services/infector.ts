@@ -26,7 +26,7 @@ export class Infector {
 
     public infect = (server: Server) => {
         try {
-            const fileCopier = new FileCopier(this.ns, server.hostname)
+            const fileCopier = new FileCopier(this.ns)
             const accessor = new Accessor(this.ns, server.hostname)
             this.logger.info(`Infecting ${server.hostname}...`)
 
@@ -34,7 +34,7 @@ export class Infector {
                 accessor.getRootAccess()
             }
 
-            fileCopier.copyScriptFiles()
+            fileCopier.copyScriptFiles(server.hostname)
 
             this.logger.info(`Successfully infected ${server.hostname}.`)
         } catch (error) {

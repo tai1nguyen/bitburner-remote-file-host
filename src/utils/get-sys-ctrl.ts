@@ -16,6 +16,5 @@ export const main = (ns: NS) => {
     const targetServer = ns.getServer(target)
 
     logExeInfo(ns)
-
     new Infector(ns).infect(targetServer)
 }

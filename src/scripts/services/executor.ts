@@ -60,7 +60,7 @@ export class Executor {
             this.logger.info(
                 `Updating files on ${host === target ? host : target}.`
             )
-            new FileCopier(this.ns, target).copyScriptFiles()
+            new FileCopier(this.ns).copyScriptFiles(target)
 
             switch (action) {
                 case ExecutorAction.grow: {
