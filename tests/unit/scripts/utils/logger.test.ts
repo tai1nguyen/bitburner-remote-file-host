@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import Mock from '/mocks/'
+import Mock from '/mocks'
 import { Logger } from '/scripts/utils/logger'
 import { formatErrorStack } from '/scripts/utils/format-error-stack'
 

@@ -80,7 +80,9 @@ const formatOutput = (
 ): string => {
     const parts: string[] = []
 
+    parts.push('-----------------------------------')
     parts.push(header)
+    parts.push('-----------------------------------')
 
     if (location) {
         parts.push('Location:')

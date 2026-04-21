@@ -2,9 +2,9 @@ import { NS } from '@ns'
 import { Logger } from '/scripts/utils/logger'
 
 export class Accessor {
-    ns: NS
-    target: string
-    logger: Logger
+    private ns: NS
+    private target: string
+    private logger: Logger
 
     /**
      * The Accessor is responsible for gaining root access on a target
@@ -63,12 +63,11 @@ export class Accessor {
             this.ns.nuke(this.target)
             this.logger.info(`Root access gained on: ${this.target}.`)
         } catch (error) {
-            this.logger.error(
-                `Failed to get root access on: ${this.target}.`,
-                error
-            )
+            this.logger.error(`Failed to get root access on: ${this.target}.`)
 
-            throw error
+            throw new Error(`Failed to get root access on: ${this.target}.`, {
+                cause: error
+            })
         }
     }
 }

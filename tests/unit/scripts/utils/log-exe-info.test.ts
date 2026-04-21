@@ -25,4 +25,15 @@ describe('logExeInfo()', () => {
             expect.stringContaining(Mock.Netscript.getScriptName())
         )
     })
+
+    it('should print the target', () => {
+        logExeInfo(Mock.Netscript as unknown as NS, 'target')
+
+        expect(Mock.Netscript.print).toHaveBeenCalledWith(
+            expect.stringContaining('target')
+        )
+        expect(Mock.Netscript.tprint).toHaveBeenCalledWith(
+            expect.stringContaining('target')
+        )
+    })
 })

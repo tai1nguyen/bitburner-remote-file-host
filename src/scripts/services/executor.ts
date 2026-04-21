@@ -60,7 +60,7 @@ export class Executor {
             this.logger.info(
                 `Updating files on ${host === target ? host : target}.`
             )
-            new FileCopier(this.ns, target).copyScriptFiles()
+            new FileCopier(this.ns).copyScriptFiles(target)
 
             switch (action) {
                 case ExecutorAction.grow: {
@@ -146,13 +146,6 @@ export class Executor {
         const maxThreads = Math.floor(ramAvailable / ramPerThread)
 
         return maxThreads
-    }
-
-    private getMinThreads = (server: Server, pathToScript: string): number => {
-        const maxThreads = this.getMaxThreads(server, pathToScript)
-        const minThreads = maxThreads >= 1 ? 1 : 0
-
-        return minThreads
     }
 
     private getAction = (action: string): ExecutorAction =>

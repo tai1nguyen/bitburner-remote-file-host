@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
 import Mock from '/mocks'
-import { Executor } from '/scripts/services/executor'
 import * as netTarget from '/utils/net-target'
 import { NS } from '@ns'
 
@@ -13,8 +12,6 @@ describe('net-target', () => {
 
         netTarget.main({ args } as NS)
 
-        expect(
-            vi.mocked(Executor).mock.results[0].value.run
-        ).toHaveBeenCalledWith(args)
+        expect(Mock.Executor.run).toHaveBeenCalledWith(args)
     })
 })

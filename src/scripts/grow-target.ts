@@ -12,8 +12,8 @@ import { grow } from './shared/grow'
 export const main = async (ns: NS) => {
     const target = ns.args[0] as string
     const logger = Logger.Builder.setLogFn(ns.print).build()
-    
-    logExeInfo(ns)
+
+    logExeInfo(ns, target)
 
     logger.info('Starting grow loop...')
 

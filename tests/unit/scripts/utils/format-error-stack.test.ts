@@ -9,7 +9,7 @@ describe('formatErrorStack()', () => {
         const result = formatErrorStack(stack)
 
         expect(result).toEqual(
-            `RUNTIME ERROR\nLocation:\n  utils/net-harvest-remote.js@home (PID - 11)\nMessage:\n  nuke: Not enough ports opened to use NUKE.exe virus.\nStack:\n  at scripts/services/accessor.js:L53@Accessor.getRootAccess\n  at scripts/services/infector.js:L28@Infector.infect\n  at utils/net-harvest-remote.js:L23@infectServer\n  at utils/net-harvest-remote.js:L-1@unknown\n  at utils/net-harvest-remote.js:L-1@unknown`
+            `-----------------------------------\nRUNTIME ERROR\n-----------------------------------\nLocation:\n  utils/net-harvest-remote.js@home (PID - 11)\nMessage:\n  nuke: Not enough ports opened to use NUKE.exe virus.\nStack:\n  at scripts/services/accessor.js:L53@Accessor.getRootAccess\n  at scripts/services/infector.js:L28@Infector.infect\n  at utils/net-harvest-remote.js:L23@infectServer\n  at utils/net-harvest-remote.js:L-1@unknown\n  at utils/net-harvest-remote.js:L-1@unknown`
         )
     })
 
@@ -23,7 +23,7 @@ describe('formatErrorStack()', () => {
         const result = formatErrorStack(error)
 
         expect(result).toEqual(
-            'ERROR\nMessage:\n  Error: Not enough threads available on home to harvest harakiri-sushi.\nStack:\n  at Executor.harvestTarget (home/scripts/services/executor.js:79:19)\n  at Executor.run (home/scripts/services/executor.js:51:26)\n  at main (home/utils/net-target.js:15:22)\n  at R (file:///D:/games/lib/bitburner/resources/app/dist/main.bundle.js:9:416387)'
+            '-----------------------------------\nERROR\n-----------------------------------\nMessage:\n  Error: Not enough threads available on home to harvest harakiri-sushi.\nStack:\n  at Executor.harvestTarget (home/scripts/services/executor.js:79:19)\n  at Executor.run (home/scripts/services/executor.js:51:26)\n  at main (home/utils/net-target.js:15:22)\n  at R (file:///D:/games/lib/bitburner/resources/app/dist/main.bundle.js:9:416387)'
         )
     })
 })
