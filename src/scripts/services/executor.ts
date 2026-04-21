@@ -57,11 +57,6 @@ export class Executor {
         }
 
         try {
-            this.logger.info(
-                `Updating files on ${host === target ? host : target}.`
-            )
-            new FileCopier(this.ns).copyScriptFiles(target)
-
             switch (action) {
                 case ExecutorAction.grow: {
                     const options: Options = { host, target }
@@ -83,6 +78,7 @@ export class Executor {
     }
 
     public growTarget = (options: Options): number => {
+        this.ensureFilesAreCurrent(options.host)
         const pathToScript = '/scripts/grow-target.js'
         const hostServer = this.ns.getServer(options.host)
         const target = options.target || hostServer.hostname
@@ -112,6 +108,7 @@ export class Executor {
     }
 
     public harvestTarget = (options: Options): number => {
+        this.ensureFilesAreCurrent(options.host)
         const pathToScript = '/scripts/harvest-target.js'
         const hostServer = this.ns.getServer(options.host)
         const target = options.target || hostServer.hostname
@@ -146,6 +143,11 @@ export class Executor {
         const maxThreads = Math.floor(ramAvailable / ramPerThread)
 
         return maxThreads
+    }
+
+    private ensureFilesAreCurrent = (host: string) => {
+        this.logger.info(`Updating files on ${host}.`)
+        new FileCopier(this.ns).copyScriptFiles(host)
     }
 
     private getAction = (action: string): ExecutorAction =>

@@ -52,5 +52,4 @@ export const main = (ns: NS) => {
     logger.warn(`Ports Currently Open: ${server.openPortCount}`)
     logger.warn('')
     logger.warn('-----------------------------------')
-    logger.warn('')
 }

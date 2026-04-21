@@ -23,43 +23,51 @@ export class WebCrawler {
         ns.disableLog('ALL')
     }
 
-    public hunt = async (serversToInfect: number): Promise<void> => {
+    public hunt = async (
+        isValid: (host: string) => boolean = () => true,
+        serversToInfect?: number
+    ): Promise<void> => {
         this.logger.info('Hunting...')
 
-        const infectServer = async (host: string): Promise<boolean> => {
-            try {
-                this.logger.info('Attempting to infect the host...')
-
-                await this.ns.sleep(1000)
-                const server: Server = this.ns.getServer(host)
-                new Infector(this.ns).infect(server)
-
-                return true
-            } catch (error) {
-                this.logger.warn(`Failed to infect host: ${host}`, error)
-                return false
-            }
-        }
-
         try {
+            const infectServer = async (host: string): Promise<boolean> => {
+                try {
+                    this.logger.info('Attempting to infect the host...')
+
+                    await this.ns.sleep(1000)
+                    const server: Server = this.ns.getServer(host)
+                    new Infector(this.ns).infect(server)
+
+                    return true
+                } catch (error) {
+                    this.logger.warn(`Failed to infect host: ${host}`, error)
+                    return false
+                }
+            }
+
             const scanNeighbors = async (host: string) => {
                 for (const neighbor of this.ns.scan(host)) {
-                    if (this.listOfServers.size < serversToInfect) {
-                        this.logger.info(`Found server: [${neighbor}].`)
-                        if (
-                            neighbor !== 'home' &&
-                            (await infectServer(neighbor))
-                        ) {
-                            this.logger.success(
-                                `Server [${neighbor}] successfully infected.`
-                            )
-                            this.listOfServers.add(neighbor)
-                        } else {
-                            this.logger.warn(`Skipping server: [${neighbor}].`)
-                        }
+                    this.logger.info(`Found server: [${neighbor}].`)
+
+                    if (
+                        neighbor !== 'home' &&
+                        isValid(neighbor) &&
+                        (await infectServer(neighbor))
+                    ) {
+                        this.logger.success(
+                            `Server [${neighbor}] successfully infected.`
+                        )
+                        this.listOfServers.add(neighbor)
                     } else {
+                        this.logger.warn(`Skipping server: [${neighbor}].`)
+                    }
+
+                    if (
+                        serversToInfect &&
+                        this.listOfServers.size >= serversToInfect + 1
+                    ) {
                         throw new Error(
-                            `Server list has reached maximum size: ${serversToInfect - 1}`
+                            `Server list has reached maximum size: ${serversToInfect}`
                         )
                     }
                 }
