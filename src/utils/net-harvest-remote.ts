@@ -22,7 +22,7 @@ export const main = async (ns: NS) => {
         .setTerminalLogFn(ns.tprint)
         .build()
 
-    await webCrawler.hunt(10)
+    await webCrawler.hunt(undefined, 10)
 
     const largestServer: string = webCrawler.getBestTarget()
     const servers: Set<string> = webCrawler.getServers()
@@ -32,23 +32,13 @@ export const main = async (ns: NS) => {
 
     try {
         for (const host of servers) {
-            await ns.sleep(1000)
             executor.growTarget({ host, target: largestServer })
+            await ns.sleep(1000)
         }
 
         logger.info('Entering harvest loop...')
 
-        executor.growTarget({
-            host: 'home',
-            target: largestServer,
-            threads: 40
-        })
-
-        executor.harvestTarget({
-            host: 'home',
-            target: largestServer,
-            threads: 40
-        })
+        executor.harvestTarget({ host: 'home', target: largestServer })
     } catch (error) {
         logger.error(`Failed to coordinate grow on ${largestServer}.`, error)
     }
