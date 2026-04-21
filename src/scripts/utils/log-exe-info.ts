@@ -14,5 +14,4 @@ export const logExeInfo = (ns: NS, target?: string) => {
     logger.info(`Running script: ${ns.getScriptName()}`)
     if (target) logger.info(`Targeting Host: ${target}`)
     logger.info('-----------------------------------')
-    logger.info('')
 }

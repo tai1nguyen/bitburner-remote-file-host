@@ -2,9 +2,9 @@ import { NS } from '@ns'
 import { Logger } from '/scripts/utils/logger'
 
 export class Accessor {
-    ns: NS
-    target: string
-    logger: Logger
+    private ns: NS
+    private target: string
+    private logger: Logger
 
     /**
      * The Accessor is responsible for gaining root access on a target

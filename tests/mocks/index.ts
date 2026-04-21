@@ -1,5 +1,7 @@
 import { Netscript } from './globals/netscript.mock'
+import { Accessor } from './scripts/services/accessor.mock'
 import { Executor } from './scripts/services/executor.mock'
 import { Infector } from './scripts/services/infector.mock'
+import { FileCopier } from './scripts/services/file-copier.mock'
 
-export default { Netscript, Executor, Infector }
+export default { Netscript, Accessor, Executor, Infector, FileCopier }
