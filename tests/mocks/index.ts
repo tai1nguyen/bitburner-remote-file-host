@@ -3,5 +3,13 @@ import { Accessor } from './scripts/services/accessor.mock'
 import { Executor } from './scripts/services/executor.mock'
 import { Infector } from './scripts/services/infector.mock'
 import { FileCopier } from './scripts/services/file-copier.mock'
+import { WebCrawler } from './scripts/services/web-crawler.mock'
 
-export default { Netscript, Accessor, Executor, Infector, FileCopier }
+export default {
+    Netscript,
+    Accessor,
+    Executor,
+    Infector,
+    FileCopier,
+    WebCrawler
+}

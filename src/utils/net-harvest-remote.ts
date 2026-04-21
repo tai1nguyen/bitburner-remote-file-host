@@ -40,13 +40,13 @@ export const main = async (ns: NS) => {
 
         executor.growTarget({
             host: 'home',
-            target: ns.getServer(largestServer).hostname,
+            target: largestServer,
             threads: 40
         })
 
         executor.harvestTarget({
             host: 'home',
-            target: ns.getServer(largestServer).hostname,
+            target: largestServer,
             threads: 40
         })
     } catch (error) {
