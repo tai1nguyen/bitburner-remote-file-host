@@ -8,7 +8,7 @@ import { Logger } from '/scripts/utils/logger'
 export const grow = async (ns: NS, target: string) => {
     const server: Server = ns.getServer(target)
     const thresholder: ThresholdCalculator = new ThresholdCalculator(server)
-    const logger: Logger = Logger.Builder.setLogFn(ns.print).build()
+    const logger: Logger = new Logger(ns)
 
     if (thresholder.isAtMoneyThreshold()) {
         // Do not waste cycles growing as it

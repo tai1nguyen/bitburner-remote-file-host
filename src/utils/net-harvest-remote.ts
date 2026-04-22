@@ -16,13 +16,20 @@ import { WebCrawler } from '/scripts/services/web-crawler'
  */
 export const main = async (ns: NS) => {
     logExeInfo(ns)
-    const webCrawler = new WebCrawler(ns)
     const executor = new Executor(ns)
-    const logger = Logger.Builder.setLogFn(ns.print)
-        .setTerminalLogFn(ns.tprint)
+    const logger = new Logger(ns)
+
+    const isValid = (host: string) => ns.getServer(host).hasAdminRights
+
+    const webCrawler = WebCrawler.Builder.setTargetPredicate(isValid)
+        .setNetscript(ns)
+        .setCount(10)
         .build()
 
-    await webCrawler.hunt(undefined, 10)
+    logger.toTerminal(true)
+    webCrawler.logToTerminal(true)
+
+    await webCrawler.hunt()
 
     const largestServer: string = webCrawler.getBestTarget()
     const servers: Set<string> = webCrawler.getServers()

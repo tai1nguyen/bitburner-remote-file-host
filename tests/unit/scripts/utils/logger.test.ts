@@ -2,17 +2,16 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import Mock from '/mocks'
 import { Logger } from '/scripts/utils/logger'
 import { formatErrorStack } from '/scripts/utils/format-error-stack'
+import { NS } from '@ns'
 
 vi.mock('/scripts/utils/format-error-stack')
 
 describe('Logger', () => {
     let logger: Logger
+    type LogMethods = Omit<Logger, 'toTerminal'>
 
     beforeEach(() => {
-        logger = Logger.Builder.setLogFn(Mock.Netscript.print)
-            .setTerminalLogFn(Mock.Netscript.tprint)
-            .setLogPrefix('Test')
-            .build()
+        logger = new Logger(Mock.Netscript as unknown as NS, 'Test')
 
         vi.mocked(formatErrorStack).mockImplementation((arg) =>
             arg instanceof Error ? arg.message : (arg as string)
@@ -26,7 +25,7 @@ describe('Logger', () => {
         { logLevel: 'error' }
     ])('Logger[$logLevel]()', ({ logLevel }: { logLevel: string }) => {
         it(`should log message at '${logLevel}' level`, () => {
-            logger[logLevel as keyof Logger]('message.')
+            logger[logLevel as keyof LogMethods]('message.')
 
             expect(Mock.Netscript.print).toHaveBeenCalledWith(
                 expect.stringContaining(
@@ -36,7 +35,8 @@ describe('Logger', () => {
         })
 
         it('should log to terminal', () => {
-            logger[logLevel as keyof Logger]('message')
+            logger.toTerminal(true)
+            logger[logLevel as keyof LogMethods]('message.')
 
             expect(Mock.Netscript.tprint).toHaveBeenCalledWith(
                 expect.stringContaining(
@@ -48,7 +48,7 @@ describe('Logger', () => {
         it('should log provided object', () => {
             const foo = { foo: 'bar' }
             const stringifiedFoo = JSON.stringify(foo, null, 2)
-            logger[logLevel as keyof Logger]('message.', foo)
+            logger[logLevel as keyof LogMethods]('message.', foo)
 
             expect(Mock.Netscript.print).toHaveBeenCalledWith(
                 expect.stringContaining(
@@ -58,9 +58,9 @@ describe('Logger', () => {
         })
 
         it('should log provided runtime error', () => {
-            logger[logLevel as keyof Logger]('message.', 'error message')
+            logger[logLevel as keyof LogMethods]('message.', 'error message')
 
-            expect(Mock.Netscript.tprint).toHaveBeenCalledWith(
+            expect(Mock.Netscript.print).toHaveBeenCalledWith(
                 expect.stringContaining(
                     `${logLevel.toUpperCase()} [Test]: message.\nerror message`
                 )
@@ -68,30 +68,16 @@ describe('Logger', () => {
         })
 
         it('should log provided error', () => {
-            logger[logLevel as keyof Logger](
+            logger[logLevel as keyof LogMethods](
                 'message.',
                 new Error('error message')
             )
 
-            expect(Mock.Netscript.tprint).toHaveBeenCalledWith(
+            expect(Mock.Netscript.print).toHaveBeenCalledWith(
                 expect.stringContaining(
                     `${logLevel.toUpperCase()} [Test]: message.\nerror message`
                 )
             )
-        })
-    })
-
-    describe('Logger.Builder', () => {
-        it('should build the logger', () => {
-            const logger = Logger.Builder.setLogFn(vi.fn())
-                .setTerminalLogFn(vi.fn())
-                .build()
-
-            expect(logger).toBeInstanceOf(Logger)
-        })
-
-        it('should throw when the print function is not provided', () => {
-            expect(Logger.Builder.build).toThrow()
         })
     })
 })

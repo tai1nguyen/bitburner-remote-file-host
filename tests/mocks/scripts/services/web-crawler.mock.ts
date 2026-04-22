@@ -3,18 +3,40 @@ import { vi } from 'vitest'
 const getBestTarget = vi.fn()
 const getServers = vi.fn()
 const hunt = vi.fn()
+const logToTerminal = vi.fn()
+
+// Builder methods
+const setTargetPredicate = vi.fn()
+const setOnTargetFound = vi.fn()
+const setNetscript = vi.fn()
+const setCount = vi.fn()
+
+const MockWebCrawler = class {
+    private constructor() {}
+
+    getBestTarget = getBestTarget
+    getServers = getServers
+    hunt = hunt
+    logToTerminal = logToTerminal
+
+    public static get Builder() {
+        return new this.WebCrawlerBuilder()
+    }
+
+    private static WebCrawlerBuilder = class {
+        setTargetPredicate = setTargetPredicate.mockReturnValue(this)
+        setOnTargetFound = setOnTargetFound.mockReturnValue(this)
+        setNetscript = setNetscript.mockReturnValue(this)
+        setCount = setCount.mockReturnValue(this)
+        build = () => new MockWebCrawler()
+    }
+}
 
 export const WebCrawler = {
-    WebCrawler: vi.fn(
-        class {
-            constructor() {}
-
-            getBestTarget = getBestTarget
-            getServers = getServers
-            hunt = hunt
-        }
-    ),
+    WebCrawler: MockWebCrawler,
     getBestTarget,
     getServers,
-    hunt
+    hunt,
+    logToTerminal,
+    Builder: { setTargetPredicate, setOnTargetFound, setNetscript, setCount }
 }

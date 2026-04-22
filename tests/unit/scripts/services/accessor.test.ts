@@ -24,10 +24,9 @@ describe('Accessor', () => {
                 const mockFn = Mocks.Netscript[key] as Mock
                 vi.mocked(Mocks.Netscript.fileExists).mockReturnValue(true)
 
-                new Accessor(
-                    Mocks.Netscript as unknown as NS,
+                new Accessor(Mocks.Netscript as unknown as NS).getRootAccess(
                     'target'
-                ).getRootAccess()
+                )
 
                 expect(mockFn).toHaveBeenCalledWith('target')
             }
@@ -41,9 +40,10 @@ describe('Accessor', () => {
                 vi.mocked(mockFn).mockThrow(new Error(`${name} failed`))
                 vi.mocked(Mocks.Netscript.fileExists).mockReturnValue(true)
 
-                expect(
-                    new Accessor(Mocks.Netscript as unknown as NS, 'target')
-                        .getRootAccess
+                expect(() =>
+                    new Accessor(
+                        Mocks.Netscript as unknown as NS
+                    ).getRootAccess('target')
                 ).not.toThrow()
             }
         )
@@ -55,10 +55,9 @@ describe('Accessor', () => {
                 const mockFn = Mocks.Netscript[key] as Mock
                 vi.mocked(Mocks.Netscript.fileExists).mockReturnValue(false)
 
-                new Accessor(
-                    Mocks.Netscript as unknown as NS,
+                new Accessor(Mocks.Netscript as unknown as NS).getRootAccess(
                     'target'
-                ).getRootAccess()
+                )
 
                 expect(mockFn).not.toHaveBeenCalled()
             }
@@ -67,10 +66,9 @@ describe('Accessor', () => {
         it('should call to nuke the server', () => {
             vi.mocked(Mocks.Netscript.fileExists).mockReturnValue(true)
 
-            new Accessor(
-                Mocks.Netscript as unknown as NS,
+            new Accessor(Mocks.Netscript as unknown as NS).getRootAccess(
                 'target'
-            ).getRootAccess()
+            )
 
             expect(Mocks.Netscript.nuke).toHaveBeenCalledWith('target')
         })
@@ -81,9 +79,10 @@ describe('Accessor', () => {
                 new Error('Failed to nuke')
             )
 
-            expect(
-                new Accessor(Mocks.Netscript as unknown as NS, 'target')
-                    .getRootAccess
+            expect(() =>
+                new Accessor(Mocks.Netscript as unknown as NS).getRootAccess(
+                    'target'
+                )
             ).toThrow('Failed to get root access on: target.')
         })
     })

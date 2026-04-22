@@ -29,11 +29,7 @@ export class Executor {
      */
     constructor(ns: NS) {
         this.ns = ns
-
-        this.logger = Logger.Builder.setLogPrefix('Executor')
-            .setLogFn(ns.print)
-            .setTerminalLogFn(ns.tprint)
-            .build()
+        this.logger = new Logger(ns, 'Executor')
 
         ns.disableLog('ALL')
     }

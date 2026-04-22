@@ -36,19 +36,6 @@ describe('net-harvest-remote', () => {
         })
     })
 
-    it('should execute grow against the target', async () => {
-        Mock.WebCrawler.getBestTarget.mockReturnValue('target')
-        Mock.WebCrawler.getServers.mockReturnValue(['target'])
-
-        await netHarvestRemote.main(Mock.Netscript as unknown as NS)
-
-        expect(Mock.Executor.growTarget).toHaveBeenCalledWith({
-            host: 'home',
-            target: 'target',
-            threads: 40
-        })
-    })
-
     it('should execute harvest against the target', async () => {
         Mock.WebCrawler.getBestTarget.mockReturnValue('target')
         Mock.WebCrawler.getServers.mockReturnValue(['target'])
@@ -57,8 +44,7 @@ describe('net-harvest-remote', () => {
 
         expect(Mock.Executor.harvestTarget).toHaveBeenCalledWith({
             host: 'home',
-            target: 'target',
-            threads: 40
+            target: 'target'
         })
     })
 

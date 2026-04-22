@@ -6,6 +6,8 @@ import { Logger } from '/scripts/utils/logger'
 export class Infector {
     ns: NS
     logger: Logger
+    accessor: Accessor
+    fileCopier: FileCopier
 
     /**
      * This service attempts to gain root access to the target server. Once access
@@ -16,25 +18,22 @@ export class Infector {
      */
     constructor(ns: NS) {
         this.ns = ns
-        this.logger = Logger.Builder.setLogPrefix('Infector')
-            .setLogFn(ns.print)
-            .setTerminalLogFn(ns.tprint)
-            .build()
+        this.fileCopier = new FileCopier(this.ns)
+        this.accessor = new Accessor(this.ns)
+        this.logger = new Logger(ns, 'Infector')
 
         ns.disableLog('ALL')
     }
 
     public infect = (server: Server) => {
         try {
-            const fileCopier = new FileCopier(this.ns)
-            const accessor = new Accessor(this.ns, server.hostname)
             this.logger.info(`Infecting ${server.hostname}...`)
 
             if (!server.hasAdminRights) {
-                accessor.getRootAccess()
+                this.accessor.getRootAccess(server.hostname)
             }
 
-            fileCopier.copyScriptFiles(server.hostname)
+            this.fileCopier.copyScriptFiles(server.hostname)
 
             this.logger.info(`Successfully infected ${server.hostname}.`)
         } catch (error) {
@@ -43,5 +42,11 @@ export class Infector {
                 cause: error
             })
         }
+    }
+
+    public logToTerminal = (toTerminal: boolean) => {
+        this.accessor.logToTerminal(toTerminal)
+        this.fileCopier.logToTerminal(toTerminal)
+        this.logger.toTerminal(toTerminal)
     }
 }

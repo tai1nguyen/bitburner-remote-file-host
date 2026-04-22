@@ -8,16 +8,18 @@ import { Logger } from '/scripts/utils/logger'
  */
 export const main = async (ns: NS) => {
     logExeInfo(ns)
-    const logger = Logger.Builder.setLogFn(ns.print)
-        .setTerminalLogFn(ns.tprint)
-        .build()
+    const logger = new Logger(ns)
+    const isTarget = (host: string) => ns.ps(host).length > 0
 
-    const webCrawler = new WebCrawler(ns)
-    await webCrawler.hunt((host: string) => ns.ps(host).length > 0)
-    const serversToKill = webCrawler.getServers()
-
-    logger.info('Killing processes on all servers...')
-    for (const host of serversToKill) {
+    const killAllProcesses = (host: string) => {
+        logger.info(`Killing processes on ${host}.`)
         ns.killall(host)
+        return true
     }
+
+    await WebCrawler.Builder.setTargetPredicate(isTarget)
+        .setOnTargetFound(killAllProcesses)
+        .setNetscript(ns)
+        .build()
+        .hunt()
 }

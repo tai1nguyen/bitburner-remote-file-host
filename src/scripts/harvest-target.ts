@@ -5,7 +5,7 @@ import { harvest } from './shared/harvest'
 
 export const main = async (ns: NS) => {
     const target = ns.args[0] as string
-    const logger = Logger.Builder.setLogFn(ns.print).build()
+    const logger = new Logger(ns)
 
     logExeInfo(ns, target)
 

@@ -14,19 +14,20 @@ export class FileCopier {
      * @param ns {NS}
      * @param target {string}
      */
-    constructor(ns: NS, host?: string) {
+    constructor(ns: NS) {
         this.ns = ns
-        this.host = host || 'home'
-        this.logger = Logger.Builder.setLogPrefix('FileCopier')
-            .setLogFn(ns.print)
-            .setTerminalLogFn(ns.tprint)
-            .build()
+        this.host = 'home'
+        this.logger = new Logger(ns, 'FileCopier')
 
         ns.disableLog('ALL')
     }
 
     public copyScriptFiles = (target: string) => {
         this.copyFilesInDirectory(this.baseDirectory, target)
+    }
+
+    public logToTerminal = (toTerminal: boolean) => {
+        this.logger.toTerminal(toTerminal)
     }
 
     private copyFilesInDirectory = (

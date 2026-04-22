@@ -1,6 +1,7 @@
 import { vi } from 'vitest'
 
 const getRootAccess = vi.fn()
+const logToTerminal = vi.fn()
 
 export const Accessor = {
     Accessor: vi.fn(
@@ -8,7 +9,9 @@ export const Accessor = {
             constructor() {}
 
             getRootAccess = getRootAccess
+            logToTerminal = logToTerminal
         }
     ),
-    getRootAccess
+    getRootAccess,
+    logToTerminal
 }
