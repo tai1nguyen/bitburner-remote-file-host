@@ -1,12 +1,16 @@
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import Mock from '/mocks'
-import * as netHarvestRemote from '/utils/net-harvest-remote'
+import * as netHarvest from '/utils/net-harvest'
 import { NS } from '@ns'
 
 vi.mock('/scripts/services/executor', () => Mock.Executor)
 vi.mock('/scripts/services/web-crawler', () => Mock.WebCrawler)
 
 describe('net-harvest-remote', () => {
+    afterEach(() => {
+        vi.resetAllMocks()
+    })
+
     it('should force all network servers to grow the target', async () => {
         Mock.WebCrawler.getBestTarget.mockReturnValue('target')
         Mock.WebCrawler.getServers.mockReturnValue([
@@ -16,7 +20,7 @@ describe('net-harvest-remote', () => {
             'host-3'
         ])
 
-        await netHarvestRemote.main(Mock.Netscript as unknown as NS)
+        await netHarvest.main(Mock.Netscript as unknown as NS)
 
         expect(Mock.Executor.growTarget).toHaveBeenCalledWith({
             host: 'target',
@@ -36,39 +40,37 @@ describe('net-harvest-remote', () => {
         })
     })
 
-    it('should execute grow against the target', async () => {
+    it('should execute grow/harvest against the target', async () => {
         Mock.WebCrawler.getBestTarget.mockReturnValue('target')
         Mock.WebCrawler.getServers.mockReturnValue(['target'])
 
-        await netHarvestRemote.main(Mock.Netscript as unknown as NS)
+        await netHarvest.main(Mock.Netscript as unknown as NS)
 
-        expect(Mock.Executor.growTarget).toHaveBeenCalledWith({
+        expect(Mock.Executor.growHarvestTarget).toHaveBeenCalledWith({
             host: 'home',
             target: 'target',
-            threads: 40
+            threads: 100
         })
     })
 
-    it('should execute harvest against the target', async () => {
+    it('should only target servers with root access', async () => {
+        Mock.Netscript.getServer.mockReturnValue({ hasAdminRights: true })
         Mock.WebCrawler.getBestTarget.mockReturnValue('target')
-        Mock.WebCrawler.getServers.mockReturnValue(['target'])
+        Mock.WebCrawler.getServers.mockReturnValue([])
+        await netHarvest.main(Mock.Netscript as unknown as NS)
+        const predicate =
+            Mock.WebCrawler.Builder.setTargetPredicate.mock.calls[0][0]
 
-        await netHarvestRemote.main(Mock.Netscript as unknown as NS)
-
-        expect(Mock.Executor.harvestTarget).toHaveBeenCalledWith({
-            host: 'home',
-            target: 'target',
-            threads: 40
-        })
+        expect(predicate('target')).toBe(true)
     })
 
-    it('should not throw', () => {
+    it('should not throw', async () => {
         Mock.WebCrawler.getBestTarget.mockReturnValue('target')
         Mock.WebCrawler.getServers.mockReturnValue(['target'])
         Mock.Executor.growTarget.mockThrow(new Error('failed to grow'))
 
-        expect(
-            netHarvestRemote.main(Mock.Netscript as unknown as NS)
+        await expect(
+            netHarvest.main(Mock.Netscript as unknown as NS)
         ).resolves.toBeUndefined()
     })
 })

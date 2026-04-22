@@ -5,6 +5,7 @@ import { NS, Server } from '@ns'
 import { Accessor } from '/scripts/services/accessor'
 import { FileCopier } from '/scripts/services/file-copier'
 
+vi.mock('/scripts/utils/logger', () => Mock.Logger)
 vi.mock('/scripts/services/accessor', () => Mock.Accessor)
 vi.mock('/scripts/services/file-copier', () => Mock.FileCopier)
 
@@ -61,6 +62,16 @@ describe('Infector', () => {
             expect(() =>
                 infector.infect({ hostname: 'target' } as Server)
             ).toThrow(`Failed to infect target`)
+        })
+    })
+
+    describe('logToTerminal()', () => {
+        it('should toggle logs to go to the terminal', () => {
+            infector.logToTerminal(true)
+
+            expect(Mock.Logger.toTerminal).toHaveBeenCalledWith(true)
+            expect(Mock.Accessor.logToTerminal).toHaveBeenCalledWith(true)
+            expect(Mock.FileCopier.logToTerminal).toHaveBeenCalledWith(true)
         })
     })
 })

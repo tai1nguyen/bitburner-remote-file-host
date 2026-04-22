@@ -1,6 +1,7 @@
 import { vi } from 'vitest'
 
 const infect = vi.fn()
+const logToTerminal = vi.fn()
 
 export const Infector = {
     Infector: vi.fn(
@@ -8,7 +9,9 @@ export const Infector = {
             constructor() {}
 
             infect = infect
+            logToTerminal = logToTerminal
         }
     ),
-    infect
+    infect,
+    logToTerminal
 }

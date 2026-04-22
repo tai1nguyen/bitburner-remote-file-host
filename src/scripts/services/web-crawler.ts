@@ -1,11 +1,16 @@
 import { NS, Server } from '@ns'
 import { Logger } from '/scripts/utils/logger'
-import { Infector } from '/scripts/services/infector'
+
+type TargetPredicate = (host: string) => boolean
+type OnTargetFound = (host: string) => boolean
 
 export class WebCrawler {
     private ns: NS
     private logger: Logger
-    private listOfServers: Set<string> = new Set(['home'])
+    private listOfServers: Set<string> = new Set([])
+    private isValidTarget: TargetPredicate = () => true
+    private onTargetFound: OnTargetFound = () => true
+    private count?: number
 
     /**
      * The WebCrawler scans the network and attempts
@@ -13,77 +18,84 @@ export class WebCrawler {
      *
      * @param ns
      */
-    constructor(ns: NS) {
+    constructor(
+        ns: NS,
+        isValidTarget?: TargetPredicate,
+        onTargetFound?: OnTargetFound,
+        count?: number
+    ) {
         this.ns = ns
-        this.logger = Logger.Builder.setLogPrefix('WebCrawler')
-            .setLogFn(ns.print)
-            .setTerminalLogFn(ns.tprint)
-            .build()
+        this.logger = new Logger(ns, 'WebCrawler')
 
         ns.disableLog('ALL')
+
+        if (isValidTarget) this.isValidTarget = isValidTarget
+        if (onTargetFound) this.onTargetFound = onTargetFound
+        if (count && count > 0) {
+            this.count = count
+        } else {
+            this.logger.warn(
+                'No count set for WebCrawler, it will traverse the entire network!'
+            )
+        }
     }
 
-    public hunt = async (
-        isValid: (host: string) => boolean = () => true,
-        serversToInfect?: number
-    ): Promise<void> => {
+    public hunt = async (): Promise<void> => {
         this.logger.info('Hunting...')
 
-        try {
-            const infectServer = async (host: string): Promise<boolean> => {
-                try {
-                    this.logger.info('Attempting to infect the host...')
+        const network: Set<string> = new Set(['home'])
 
-                    await this.ns.sleep(1000)
-                    const server: Server = this.ns.getServer(host)
-                    new Infector(this.ns).infect(server)
-
-                    return true
-                } catch (error) {
-                    this.logger.warn(`Failed to infect host: ${host}`, error)
-                    return false
-                }
+        const isAbleToAdd = async (host: string) => {
+            const verifyTarget = async (host: string) => {
+                await this.ns.sleep(250)
+                return this.isValidTarget(host)
             }
 
+            const handleTarget = async (host: string) => {
+                await this.ns.sleep(250)
+                return this.onTargetFound(host)
+            }
+
+            if (host === 'home') {
+                return false
+            }
+
+            return (await verifyTarget(host)) && (await handleTarget(host))
+        }
+
+        try {
             const scanNeighbors = async (host: string) => {
                 for (const neighbor of this.ns.scan(host)) {
                     this.logger.info(`Found server: [${neighbor}].`)
+                    network.add(neighbor)
 
-                    if (
-                        neighbor !== 'home' &&
-                        isValid(neighbor) &&
-                        (await infectServer(neighbor))
-                    ) {
+                    if (await isAbleToAdd(neighbor)) {
                         this.logger.success(
-                            `Server [${neighbor}] successfully infected.`
+                            `Adding server [${neighbor}] to list.`
                         )
                         this.listOfServers.add(neighbor)
                     } else {
                         this.logger.warn(`Skipping server: [${neighbor}].`)
                     }
 
-                    if (
-                        serversToInfect &&
-                        this.listOfServers.size >= serversToInfect + 1
-                    ) {
+                    if (this.count && this.listOfServers.size >= this.count) {
                         throw new Error(
-                            `Server list has reached maximum size: ${serversToInfect}`
+                            `Server list has reached maximum size: ${this.count}`
                         )
                     }
                 }
             }
 
-            for (const host of this.listOfServers) {
+            for (const host of network) {
                 this.logger.info(`Scanning neighbors of [${host}]`)
                 await scanNeighbors(host)
             }
 
-            this.logger.warn('No more servers found on the network...')
+            this.logger.info(`Finished scanning ${network.size} servers.`)
+            this.logger.info('No more servers found on the network.')
         } catch (error) {
             this.logger.warn('Error:', error)
         }
-
-        this.listOfServers.delete('home')
     }
 
     public getBestTarget = (): string => {
@@ -116,4 +128,51 @@ export class WebCrawler {
     }
 
     public getServers = () => this.listOfServers
+
+    public logToTerminal = (toTerminal: boolean) =>
+        this.logger.toTerminal(toTerminal)
+
+    public static get Builder() {
+        return new WebCrawler.WebCrawlerBuilder()
+    }
+
+    private static WebCrawlerBuilder = class {
+        private isValidTarget?: TargetPredicate
+        private onTargetFound?: OnTargetFound
+        private count?: number
+        private ns?: NS
+
+        public setTargetPredicate = (isValid: TargetPredicate) => {
+            this.isValidTarget = isValid
+            return this
+        }
+
+        public setOnTargetFound = (onTarget: OnTargetFound) => {
+            this.onTargetFound = onTarget
+            return this
+        }
+
+        public setCount = (count: number) => {
+            this.count = count
+            return this
+        }
+
+        public setNetscript = (ns: NS) => {
+            this.ns = ns
+            return this
+        }
+
+        public build = () => {
+            if (!this.ns) {
+                throw new Error('Netscript not provided.')
+            }
+
+            return new WebCrawler(
+                this.ns,
+                this.isValidTarget,
+                this.onTargetFound,
+                this.count
+            )
+        }
+    }
 }

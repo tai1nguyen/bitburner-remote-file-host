@@ -8,7 +8,11 @@ import { Logger } from '/scripts/utils/logger'
 export const grow = async (ns: NS, target: string) => {
     const server: Server = ns.getServer(target)
     const thresholder: ThresholdCalculator = new ThresholdCalculator(server)
-    const logger: Logger = Logger.Builder.setLogFn(ns.print).build()
+    const logger: Logger = new Logger(ns)
+
+    if (thresholder.isAtSecurityThreshold()) {
+        logger.success(`[${target}] is at or below security threshold`)
+    }
 
     if (thresholder.isAtMoneyThreshold()) {
         // Do not waste cycles growing as it
@@ -20,10 +24,5 @@ export const grow = async (ns: NS, target: string) => {
         await ns.grow(target)
     }
 
-    if (thresholder.isAtSecurityThreshold()) {
-        logger.success(`[${target}] is at or below security threshold`)
-    }
-
-    logger.info(`Weakening [${target}]...`)
     await ns.weaken(target)
 }

@@ -3,6 +3,8 @@ import { NS } from '@ns'
 import Mock from '/mocks'
 import { FileCopier } from '/scripts/services/file-copier'
 
+vi.mock('/scripts/utils/logger', () => Mock.Logger)
+
 describe('FileCopier', () => {
     it('should copy all files from /scripts', () => {
         vi.mocked(Mock.Netscript.ls).mockReturnValue([
@@ -11,7 +13,7 @@ describe('FileCopier', () => {
             '/file-in-root.js'
         ])
 
-        new FileCopier(Mock.Netscript as unknown as NS, 'host').copyScriptFiles(
+        new FileCopier(Mock.Netscript as unknown as NS).copyScriptFiles(
             'target'
         )
 
@@ -32,5 +34,13 @@ describe('FileCopier', () => {
         expect(
             new FileCopier(Mock.Netscript as unknown as NS).copyScriptFiles
         ).not.toThrow()
+    })
+
+    describe('logToTerminal()', () => {
+        it('should toggle logs to go to the terminal', () => {
+            new FileCopier(Mock.Netscript as unknown as NS).logToTerminal(true)
+
+            expect(Mock.Logger.toTerminal).toHaveBeenCalledWith(true)
+        })
     })
 })

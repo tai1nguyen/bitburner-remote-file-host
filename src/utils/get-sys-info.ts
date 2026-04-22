@@ -11,9 +11,8 @@ import { Logger } from '/scripts/utils/logger'
 export const main = (ns: NS) => {
     const target = ns.args[0] as string
     const server = ns.getServer(target)
-    const logger = Logger.Builder.setLogFn(ns.print)
-        .setTerminalLogFn(ns.tprint)
-        .build()
+    const logger = new Logger(ns)
+    logger.toTerminal(true)
 
     logger.warn('-----------------------------------')
     logger.warn('Server Infomation')
