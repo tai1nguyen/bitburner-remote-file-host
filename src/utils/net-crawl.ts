@@ -14,7 +14,6 @@ export const main = async (ns: NS) => {
     const accessor = new Accessor(ns)
     const fileCopier = new FileCopier(ns)
 
-    // determine if the host on the network is a new server we havent seen before.
     const isTarget = (host: string): boolean => {
         return !ns.hasRootAccess(host)
     }

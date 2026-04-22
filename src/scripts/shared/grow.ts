@@ -10,6 +10,10 @@ export const grow = async (ns: NS, target: string) => {
     const thresholder: ThresholdCalculator = new ThresholdCalculator(server)
     const logger: Logger = new Logger(ns)
 
+    if (thresholder.isAtSecurityThreshold()) {
+        logger.success(`[${target}] is at or below security threshold`)
+    }
+
     if (thresholder.isAtMoneyThreshold()) {
         // Do not waste cycles growing as it
         // will continually increase security levels.
@@ -17,13 +21,7 @@ export const grow = async (ns: NS, target: string) => {
         logger.success(`Current money: ${server.moneyAvailable}`)
     } else {
         logger.info('Growing...')
+        await ns.weaken(target)
         await ns.grow(target)
     }
-
-    if (thresholder.isAtSecurityThreshold()) {
-        logger.success(`[${target}] is at or below security threshold`)
-    }
-
-    logger.info(`Weakening [${target}]...`)
-    await ns.weaken(target)
 }

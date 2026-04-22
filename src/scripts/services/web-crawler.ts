@@ -7,7 +7,7 @@ type OnTargetFound = (host: string) => boolean
 export class WebCrawler {
     private ns: NS
     private logger: Logger
-    private listOfValidServers: Set<string> = new Set([])
+    private listOfServers: Set<string> = new Set([])
     private isValidTarget: TargetPredicate = () => true
     private onTargetFound: OnTargetFound = () => true
     private count?: number
@@ -47,12 +47,12 @@ export class WebCrawler {
 
         const isAbleToAdd = async (host: string) => {
             const verifyTarget = async (host: string) => {
-                await this.ns.sleep(500)
+                await this.ns.sleep(250)
                 return this.isValidTarget(host)
             }
 
             const handleTarget = async (host: string) => {
-                await this.ns.sleep(500)
+                await this.ns.sleep(250)
                 return this.onTargetFound(host)
             }
 
@@ -73,15 +73,12 @@ export class WebCrawler {
                         this.logger.success(
                             `Adding server [${neighbor}] to list.`
                         )
-                        this.listOfValidServers.add(neighbor)
+                        this.listOfServers.add(neighbor)
                     } else {
                         this.logger.warn(`Skipping server: [${neighbor}].`)
                     }
 
-                    if (
-                        this.count &&
-                        this.listOfValidServers.size >= this.count
-                    ) {
+                    if (this.count && this.listOfServers.size >= this.count) {
                         throw new Error(
                             `Server list has reached maximum size: ${this.count}`
                         )
@@ -94,7 +91,8 @@ export class WebCrawler {
                 await scanNeighbors(host)
             }
 
-            this.logger.info('No more servers found on the network...')
+            this.logger.info(`Finished scanning ${network.size} servers.`)
+            this.logger.info('No more servers found on the network.')
         } catch (error) {
             this.logger.warn('Error:', error)
         }
@@ -103,7 +101,7 @@ export class WebCrawler {
     public getBestTarget = (): string => {
         const servers: Server[] = []
 
-        this.listOfValidServers.forEach((host) => {
+        this.listOfServers.forEach((host) => {
             servers.push(this.ns.getServer(host))
         })
 
@@ -129,7 +127,7 @@ export class WebCrawler {
         return largestServer.hostname
     }
 
-    public getServers = () => this.listOfValidServers
+    public getServers = () => this.listOfServers
 
     public logToTerminal = (toTerminal: boolean) =>
         this.logger.toTerminal(toTerminal)

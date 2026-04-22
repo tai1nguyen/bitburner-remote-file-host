@@ -45,7 +45,11 @@ export const main = async (ns: NS) => {
 
         logger.info('Entering harvest loop...')
 
-        executor.harvestTarget({ host: 'home', target: largestServer })
+        executor.growHarvestTarget({
+            host: 'home',
+            target: largestServer,
+            threads: 100
+        })
     } catch (error) {
         logger.error(`Failed to coordinate grow on ${largestServer}.`, error)
     }

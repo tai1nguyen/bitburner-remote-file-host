@@ -1,7 +1,9 @@
-import { afterEach, describe, expect, it, vi, Mock } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { NS } from '@ns'
-import Mocks from '/mocks'
+import Mock from '/mocks'
 import { Accessor } from '/scripts/services/accessor'
+
+vi.mock('/scripts/utils/logger', () => Mock.Logger)
 
 describe('Accessor', () => {
     describe('getRootAccess()', () => {
@@ -20,11 +22,11 @@ describe('Accessor', () => {
         it.for(executables)(
             'should open ports with [$fileName]',
             ({ name }: { name: string }) => {
-                const key = name as keyof typeof Mocks.Netscript
-                const mockFn = Mocks.Netscript[key] as Mock
-                vi.mocked(Mocks.Netscript.fileExists).mockReturnValue(true)
+                const key = name as keyof typeof Mock.Netscript
+                const mockFn = Mock.Netscript[key]
+                vi.mocked(Mock.Netscript.fileExists).mockReturnValue(true)
 
-                new Accessor(Mocks.Netscript as unknown as NS).getRootAccess(
+                new Accessor(Mock.Netscript as unknown as NS).getRootAccess(
                     'target'
                 )
 
@@ -35,15 +37,15 @@ describe('Accessor', () => {
         it.for(executables)(
             'should not throw when [$fileName] fails',
             ({ name }: { name: string }) => {
-                const key = name as keyof typeof Mocks.Netscript
-                const mockFn = Mocks.Netscript[key] as Mock
+                const key = name as keyof typeof Mock.Netscript
+                const mockFn = Mock.Netscript[key] as typeof vi.fn
                 vi.mocked(mockFn).mockThrow(new Error(`${name} failed`))
-                vi.mocked(Mocks.Netscript.fileExists).mockReturnValue(true)
+                vi.mocked(Mock.Netscript.fileExists).mockReturnValue(true)
 
                 expect(() =>
-                    new Accessor(
-                        Mocks.Netscript as unknown as NS
-                    ).getRootAccess('target')
+                    new Accessor(Mock.Netscript as unknown as NS).getRootAccess(
+                        'target'
+                    )
                 ).not.toThrow()
             }
         )
@@ -51,11 +53,11 @@ describe('Accessor', () => {
         it.for(executables)(
             'should not run [$fileName] when it does not exist',
             ({ name }: { name: string }) => {
-                const key = name as keyof typeof Mocks.Netscript
-                const mockFn = Mocks.Netscript[key] as Mock
-                vi.mocked(Mocks.Netscript.fileExists).mockReturnValue(false)
+                const key = name as keyof typeof Mock.Netscript
+                const mockFn = Mock.Netscript[key]
+                vi.mocked(Mock.Netscript.fileExists).mockReturnValue(false)
 
-                new Accessor(Mocks.Netscript as unknown as NS).getRootAccess(
+                new Accessor(Mock.Netscript as unknown as NS).getRootAccess(
                     'target'
                 )
 
@@ -64,26 +66,34 @@ describe('Accessor', () => {
         )
 
         it('should call to nuke the server', () => {
-            vi.mocked(Mocks.Netscript.fileExists).mockReturnValue(true)
+            vi.mocked(Mock.Netscript.fileExists).mockReturnValue(true)
 
-            new Accessor(Mocks.Netscript as unknown as NS).getRootAccess(
+            new Accessor(Mock.Netscript as unknown as NS).getRootAccess(
                 'target'
             )
 
-            expect(Mocks.Netscript.nuke).toHaveBeenCalledWith('target')
+            expect(Mock.Netscript.nuke).toHaveBeenCalledWith('target')
         })
 
         it('should throw when the nuke fails', () => {
-            vi.mocked(Mocks.Netscript.fileExists).mockReturnValue(true)
-            vi.mocked(Mocks.Netscript.nuke).mockThrow(
+            vi.mocked(Mock.Netscript.fileExists).mockReturnValue(true)
+            vi.mocked(Mock.Netscript.nuke).mockThrow(
                 new Error('Failed to nuke')
             )
 
             expect(() =>
-                new Accessor(Mocks.Netscript as unknown as NS).getRootAccess(
+                new Accessor(Mock.Netscript as unknown as NS).getRootAccess(
                     'target'
                 )
             ).toThrow('Failed to get root access on: target.')
+        })
+    })
+
+    describe('logToTerminal()', () => {
+        it('should toggle logs to go to the terminal', () => {
+            new Accessor(Mock.Netscript as unknown as NS).logToTerminal(true)
+
+            expect(Mock.Logger.toTerminal).toHaveBeenCalledWith(true)
         })
     })
 })

@@ -2,7 +2,6 @@ import { vi } from 'vitest'
 
 export const Netscript = {
     args: [] as string[],
-
     // port openers
     brutessh: vi.fn(),
     ftpcrack: vi.fn(),
@@ -21,5 +20,7 @@ export const Netscript = {
     getServer: vi.fn(),
     ls: vi.fn(),
     scp: vi.fn(),
-    sleep: vi.fn()
+    sleep: vi.fn(),
+    ps: vi.fn(),
+    killall: vi.fn()
 }
