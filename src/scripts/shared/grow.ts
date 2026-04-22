@@ -21,7 +21,8 @@ export const grow = async (ns: NS, target: string) => {
         logger.success(`Current money: ${server.moneyAvailable}`)
     } else {
         logger.info('Growing...')
-        await ns.weaken(target)
         await ns.grow(target)
     }
+
+    await ns.weaken(target)
 }
