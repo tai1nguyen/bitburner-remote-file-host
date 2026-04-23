@@ -21,5 +21,5 @@ export const main = async (ns: NS) => {
         .setOnTargetFound(killAllProcesses)
         .setNetscript(ns)
         .build()
-        .hunt()
+        .start()
 }

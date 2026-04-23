@@ -2,7 +2,7 @@ import { vi } from 'vitest'
 
 const getBestTarget = vi.fn()
 const getServers = vi.fn()
-const hunt = vi.fn()
+const start = vi.fn()
 const logToTerminal = vi.fn()
 
 // Builder methods
@@ -16,7 +16,7 @@ const MockWebCrawler = class {
 
     getBestTarget = getBestTarget
     getServers = getServers
-    hunt = hunt
+    start = start
     logToTerminal = logToTerminal
 
     public static get Builder() {
@@ -36,7 +36,7 @@ export const WebCrawler = {
     WebCrawler: MockWebCrawler,
     getBestTarget,
     getServers,
-    hunt,
+    start,
     logToTerminal,
     Builder: { setTargetPredicate, setOnTargetFound, setNetscript, setCount }
 }
