@@ -24,5 +24,6 @@ export const Netscript = {
     ps: vi.fn(),
     killall: vi.fn(),
     exec: vi.fn(),
-    getScriptRam: vi.fn()
+    getScriptRam: vi.fn(),
+    scan: vi.fn()
 }
