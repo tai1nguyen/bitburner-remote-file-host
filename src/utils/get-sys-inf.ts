@@ -3,10 +3,6 @@ import { Logger } from '/scripts/utils/logger'
 
 /**
  * This script retrieves and prints various information about the target server.
- *
- * @param target {string} - The server to get information about. This
- *  is expected to be passed as the first argument
- *  when executing the script.
  */
 export const main = (ns: NS) => {
     const target = ns.args[0] as string

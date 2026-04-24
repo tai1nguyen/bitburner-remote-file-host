@@ -13,7 +13,6 @@ export type RunArgs = [
 
 export enum ExecutorAction {
     grow = 'grow',
-    growHarvest = 'growHarvest',
     harvest = 'harvest'
 }
 
@@ -63,11 +62,6 @@ export class Executor {
                 case ExecutorAction.harvest: {
                     const options: Options = { host, target }
                     this.harvestTarget(options)
-                    break
-                }
-                case ExecutorAction.growHarvest: {
-                    const options: Options = { host, target }
-                    this.growHarvestTarget(options)
                     break
                 }
             }
@@ -125,36 +119,6 @@ export class Executor {
 
         this.logger.info(
             `Harvesting ${target} using ${threadsToUse} thread(s) on ${options.host}.`
-        )
-
-        const pid = this.ns.exec(
-            pathToScript,
-            options.host,
-            threadsToUse,
-            target
-        )
-
-        this.logger.info(`Executed with PID: ${pid}`)
-
-        return pid
-    }
-
-    public growHarvestTarget = (options: Options): number => {
-        this.ensureFilesAreCurrent(options.host)
-        const pathToScript = '/scripts/grow-harvest-target.js'
-        const hostServer = this.ns.getServer(options.host)
-        const target = options.target || hostServer.hostname
-        const threadsToUse =
-            options.threads || this.getMaxThreads(hostServer, pathToScript)
-
-        if (threadsToUse <= 0) {
-            throw new Error(
-                `Not enough threads available on ${options.host} to grow/harvest ${target}.`
-            )
-        }
-
-        this.logger.info(
-            `Growing/harvesting ${target} using ${threadsToUse} thread(s) on ${options.host}.`
         )
 
         const pid = this.ns.exec(

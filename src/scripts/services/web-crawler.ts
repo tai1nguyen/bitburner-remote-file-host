@@ -1,4 +1,4 @@
-import { NS, Server } from '@ns'
+import { NS } from '@ns'
 import { Logger } from '/scripts/utils/logger'
 
 type TargetPredicate = (host: string) => boolean
@@ -40,8 +40,8 @@ export class WebCrawler {
         }
     }
 
-    public hunt = async (): Promise<void> => {
-        this.logger.info('Hunting...')
+    public start = async (): Promise<void> => {
+        this.logger.info('Crawling the network...')
 
         const network: Set<string> = new Set(['home'])
 
@@ -96,35 +96,6 @@ export class WebCrawler {
         } catch (error) {
             this.logger.warn('Error:', error)
         }
-    }
-
-    public getBestTarget = (): string => {
-        const servers: Server[] = []
-
-        this.listOfServers.forEach((host) => {
-            servers.push(this.ns.getServer(host))
-        })
-
-        this.logger.info('Determining the host with the most money...')
-
-        const largestServer = servers.reduce((prev, curr) => {
-            const prevServerMoney = prev.moneyAvailable || 0
-            const prevServerMaxMoney = prev.moneyMax || 0
-            const currServerMoney = curr.moneyAvailable || 0
-            const currServerMaxMoney = curr.moneyMax || 0
-
-            const prevHasMoreTotalMoney =
-                prevServerMoney >= currServerMoney ||
-                prevServerMaxMoney >= currServerMaxMoney
-
-            return prevHasMoreTotalMoney ? prev : curr
-        })
-
-        this.logger.success(`Host: [${largestServer.hostname}]`)
-        this.logger.success(`Current money: ${largestServer.moneyAvailable}`)
-        this.logger.success(`Max money: ${largestServer.moneyMax}`)
-
-        return largestServer.hostname
     }
 
     public getServers = () => this.listOfServers

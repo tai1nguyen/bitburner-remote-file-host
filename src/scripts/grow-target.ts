@@ -1,7 +1,7 @@
 import { NS } from '@ns'
 import { logExeInfo } from './utils/log-exe-info'
 import { Logger } from './utils/logger'
-import { grow } from './shared/grow'
+import { growWeaken } from './shared/grow-weaken'
 
 /**
  * This script prepares the target server for harvest by growing
@@ -19,6 +19,6 @@ export const main = async (ns: NS) => {
 
     while (true) {
         ns.clearLog()
-        await grow(ns, target)
+        await growWeaken(ns, target)
     }
 }

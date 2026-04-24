@@ -19,7 +19,7 @@ export class ThresholdCalculator {
         return (this.server.hackDifficulty || 0) <= targetSecurityThreshold
     }
 
-    private getTargetMoneyThreshold = () => (this.server.moneyMax || 0) * 0.8
+    private getTargetMoneyThreshold = () => (this.server.moneyMax || 0) * 0.95
 
     private getTargetSecurityThreshold = () =>
         (this.server.minDifficulty || 0) + 0.5
