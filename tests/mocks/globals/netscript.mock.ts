@@ -22,5 +22,7 @@ export const Netscript = {
     scp: vi.fn(),
     sleep: vi.fn(),
     ps: vi.fn(),
-    killall: vi.fn()
+    killall: vi.fn(),
+    exec: vi.fn(),
+    getScriptRam: vi.fn()
 }

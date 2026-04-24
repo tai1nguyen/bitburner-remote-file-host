@@ -1,5 +1,5 @@
 /**
- * Creates an array of values not present in the provided arrays.
+ * Returns the provided array filtered by the values provided.
  *
  * @param array The array to inspect.
  * @param values The values to exclude.
