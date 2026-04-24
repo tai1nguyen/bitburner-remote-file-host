@@ -1,15 +1,15 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import Mock from '/mocks'
-import * as getSysInfo from '/utils/get-sys-info'
+import * as getSysInf from '/utils/get-sys-inf'
 import { NS } from '@ns'
 
-describe('get-sys-info', () => {
+describe('get-sys-inf', () => {
     beforeEach(() => {
         Mock.Netscript.getServer.mockReturnValue({})
     })
 
     it('should print server information', () => {
-        getSysInfo.main(Mock.Netscript as unknown as NS)
+        getSysInf.main(Mock.Netscript as unknown as NS)
 
         expect(Mock.Netscript.print).toHaveBeenCalledWith(
             'WARN [Main]: Server Infomation'
@@ -29,7 +29,7 @@ describe('get-sys-info', () => {
     })
 
     it('should print to terminal server information', () => {
-        getSysInfo.main(Mock.Netscript as unknown as NS)
+        getSysInf.main(Mock.Netscript as unknown as NS)
 
         expect(Mock.Netscript.tprint).toHaveBeenCalledWith(
             'WARN [Main]: Server Infomation'

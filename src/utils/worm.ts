@@ -18,6 +18,10 @@ export const main = async (ns: NS) => {
     const fileCopier = new FileCopier(ns)
     const harvestQueue = ns.getPortHandle(1)
 
+    const isHackable = (host: string): boolean =>
+        ns.getPlayer().skills.hacking >=
+        (ns.getServer(host).requiredHackingSkill || 0)
+
     const infectTarget = (host: string): boolean => {
         try {
             if (!ns.hasRootAccess(host)) {
@@ -38,6 +42,7 @@ export const main = async (ns: NS) => {
         ns.clearLog()
         logger.info('Executing Worm program...')
         const crawler = WebCrawler.Builder.setNetscript(ns)
+            .setTargetPredicate(isHackable)
             .setOnTargetFound(infectTarget)
             .build()
 

@@ -11,13 +11,10 @@ export const getBestTarget = (listOfServers: Set<string>, ns: NS): string => {
     })
 
     const largestServer = servers.reduce((prev, curr) => {
-        const prevServerMoney = prev.moneyAvailable || 0
         const prevServerMaxMoney = prev.moneyMax || 0
-        const currServerMoney = curr.moneyAvailable || 0
         const currServerMaxMoney = curr.moneyMax || 0
 
         const prevHasMoreTotalMoney =
-            prevServerMoney >= currServerMoney ||
             prevServerMaxMoney >= currServerMaxMoney
 
         return prevHasMoreTotalMoney ? prev : curr
