@@ -51,10 +51,14 @@ export class NodeManager {
     }
 
     private handleHomeProcesses = (target: string) => {
-        this.logger.info('Killing harvest process on home.')
-        this.ns.scriptKill('scripts/harvest-target.js', 'home')
-        this.logger.info('Starting harvest process on home.')
-        this.executor.harvestTarget({ host: 'home', target, threads: 400 })
+        try {
+            this.logger.info('Killing harvest process on home.')
+            this.ns.scriptKill('scripts/harvest-target.js', 'home')
+            this.logger.info('Starting harvest process on home.')
+            this.executor.harvestTarget({ host: 'home', target, threads: 400 })
+        } catch (error) {
+            this.logger.warn(`Failed to handle home processes.`, error)
+        }
     }
 
     private startNodeProcesses = async (nodes: string[], target: string) => {
@@ -89,30 +93,23 @@ export class NodeManager {
 
         servers.forEach((host) => nodeSuspects.push(host))
 
-        if (hasNodes(nodeSuspects)) {
-            // use all nodes available.
-            return nodeSuspects.filter(isNode)
-        } else {
-            this.logger.info(
-                'No worker nodes found. Using the first 15 hosts on the network as worker nodes.'
-            )
+        const nodes = hasNodes(nodeSuspects)
+            ? nodeSuspects.filter(isNode)
+            : nodeSuspects
 
-            // use the first 15 hosts as nodes.
-            return nodeSuspects
-                .map((host: string) => {
-                    const server = this.ns.getServer(host)
-                    const ramCost = this.ns.getScriptRam(
-                        '/scripts/harvest-target.js'
-                    )
+        return nodes
+            .map((host) => {
+                const server = this.ns.getServer(host)
+                const ramCost = this.ns.getScriptRam(
+                    '/scripts/harvest-target.js'
+                )
 
-                    if (ramCost <= server.maxRam) {
-                        return host
-                    }
+                if (ramCost <= server.maxRam) {
+                    return host
+                }
 
-                    return null
-                })
-                .filter((host) => host !== null)
-                .slice(0, 15)
-        }
+                return null
+            })
+            .filter((host) => host !== null)
     }
 }
