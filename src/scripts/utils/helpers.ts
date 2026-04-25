@@ -1,5 +1,5 @@
 /**
- * Returns the provided array filtered by the values provided.
+ * Returns an array of values from the input array filtered by the values provided.
  *
  * @param array The array to inspect.
  * @param values The values to exclude.
