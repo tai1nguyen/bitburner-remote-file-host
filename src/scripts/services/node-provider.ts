@@ -8,13 +8,29 @@ export class NodeProvider {
     private ramMultiplier: number = 3 // 8gb
     private nodeNamePrefix: string = 'node'
 
+    /**
+     * The Node Provider attempts to determine which network hosts
+     * are valid nodes and, if possible, how many cloud servers
+     * to purchase as nodes. Additionally, it also handles when
+     * to upgrade cloud server nodes.
+     *
+     * @param ns
+     */
     constructor(ns: NS) {
         this.ns = ns
         this.logger = new Logger(ns, 'NodeProvider')
     }
 
+    /**
+     * Takes an array of nodes and will attempt to upgrade them all to the same ram
+     * level. If all nodes are on the same ram level it will attempt to upgrade all
+     * nodes to the next greatest ram level that is affordable.
+     *
+     * @param currentNodes
+     * @returns Returns an array of nodes that have been updated.
+     */
     public upgradeNodes = (currentNodes: string[]): string[] => {
-        if (_.isEmpty(currentNodes)) {
+        if (_.isEmpty(currentNodes) || !this.isUsingWorkerNodes(currentNodes)) {
             this.logger.warn('No nodes to upgrade')
             return []
         }
@@ -64,18 +80,17 @@ export class NodeProvider {
     }
 
     /**
-     * Gets worker nodes. Will return a list with only worker nodes or network
-     * hosts. It should never return an array of mixed node types.
+     * Gets worker nodes. If nodes (cloud servers) are purchasable, it will
+     * return a list of nodes that has been bought. Otherwise, return a
+     * list of network hosts that are able to run the harvest script.
      *
      * @param currentNodes
      * @param servers
-     * @returns Returns a list of worker nodes or network hosts.
+     * @returns Returns an array of worker nodes or network hosts.
      */
     public getNodes = (currentNodes: string[], servers: string[]): string[] => {
         const isAbleToBuyNodes = this.getMaxPurchasableRam() > 0
-        const isUsingWorkerNodes = !!currentNodes.find((host) =>
-            host.includes(this.nodeNamePrefix)
-        )
+        const isUsingWorkerNodes = this.isUsingWorkerNodes(currentNodes)
 
         if (isAbleToBuyNodes || isUsingWorkerNodes) {
             const existingNodes = servers
@@ -86,7 +101,6 @@ export class NodeProvider {
 
             return this.getWorkerNodes(listOfUniqueNodes)
         } else {
-            // return the max number of network hosts that can run the script.
             return this.getNetworkNodes(servers)
         }
     }
@@ -188,4 +202,7 @@ export class NodeProvider {
 
         return purchasableRam
     }
+
+    private isUsingWorkerNodes = (nodes: string[]) =>
+        !!nodes.find((host) => host.includes(this.nodeNamePrefix))
 }

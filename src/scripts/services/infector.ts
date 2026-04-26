@@ -14,7 +14,7 @@ export class Infector {
      * is attained it then copies over scripts to prepare the server for
      * further actions.
      *
-     * @param ns {NS}
+     * @param ns
      */
     constructor(ns: NS) {
         this.ns = ns
@@ -25,6 +25,12 @@ export class Infector {
         ns.disableLog('ALL')
     }
 
+    /**
+     * Attempts to gain root access. If successful, it will then copy
+     * scripts from the home server to the infected host.
+     *
+     * @param server
+     */
     public infect = (server: Server) => {
         try {
             this.logger.info(`Infecting ${server.hostname}...`)

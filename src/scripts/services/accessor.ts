@@ -9,8 +9,7 @@ export class Accessor {
      * The Accessor is responsible for gaining root access on a target
      * server by using any available port-opening programs.
      *
-     * @param ns {NS}
-     * @param target {string}
+     * @param ns
      */
     constructor(ns: NS) {
         this.ns = ns
@@ -19,6 +18,13 @@ export class Accessor {
         ns.disableLog('ALL')
     }
 
+    /**
+     * Attempts to gain root access. First opens ports on the server
+     * using all available port opening programs. Finally it will
+     * attempt to nuke the target for root access.
+     *
+     * @param target
+     */
     public getRootAccess = (target: string) => {
         this.logger.info(`Gaining root access on: ${target}.`)
 

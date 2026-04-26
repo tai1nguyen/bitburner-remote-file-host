@@ -4,11 +4,6 @@ import { Executor } from './executor'
 import { NodeProvider } from './node-provider'
 import _ from '/scripts/utils/helpers'
 
-/**
- * This class manages the network of worker nodes used to attack
- * hosts. It handles determining which hosts to use as nodes
- * and what scripts to execute on nodes.
- */
 export class NodeManager {
     private ns: NS
     private logger: Logger
@@ -18,6 +13,12 @@ export class NodeManager {
     private currentTarget?: string = undefined
     private nodePrefix: string = 'node'
 
+    /**
+     * This class manages the network of worker nodes used to attack
+     * hosts.
+     *
+     * @param ns
+     */
     constructor(ns: NS) {
         this.executor = new Executor(ns)
         this.nodeProvider = new NodeProvider(ns)
@@ -25,6 +26,20 @@ export class NodeManager {
         this.ns = ns
     }
 
+    /**
+     * Handles updates from the Worm program. Will point all nodes to the provided target.
+     * Nodes in this context are either network hosts or cloud servers that are used as
+     * vectors of attack. If a new target is provided it will kill all running processes
+     * on current nodes and spin up new ones pointing to the new target.
+     *
+     * Additionally, if new nodes are discovered it will handle adding those nodes to its
+     * list of worker nodes. If all nodes are cloud servers and there are no new
+     * nodes to added, it will attempt to upgrade nodes.
+     *
+     * @param target
+     * @param servers
+     * @returns Promise<void>
+     */
     public processUpdates = async (target: string, servers: string[]) => {
         this.logger.info('Processing updates...')
 
@@ -94,7 +109,7 @@ export class NodeManager {
     }
 
     private startNodeProcesses = async (nodes: string[], target: string) => {
-        this.logger.info('Starting processes...')
+        this.logger.info('Starting node processes...')
         for (const node of nodes) {
             try {
                 this.ns.killall(node)
@@ -108,7 +123,7 @@ export class NodeManager {
     }
 
     private stopNodeProcesses = (servers: string[]) => {
-        this.logger.info('Stopping processes...')
+        this.logger.info('Stopping node processes...')
 
         servers.forEach((host) => {
             this.logger.info(`Killing processes on ${host}.`)
