@@ -16,7 +16,7 @@ export const main = async (ns: NS) => {
     const logger = new Logger(ns)
     const accessor = new Accessor(ns)
     const fileCopier = new FileCopier(ns)
-    const harvestQueue = ns.getPortHandle(1)
+    const WormUpdates = ns.getPortHandle(1)
 
     const isHackable = (host: string): boolean =>
         ns.getPlayer().skills.hacking >=
@@ -53,7 +53,7 @@ export const main = async (ns: NS) => {
 
         servers.forEach((host) => serializeableServers.push(host))
 
-        harvestQueue.write({ target, servers: serializeableServers })
+        WormUpdates.write({ target, servers: serializeableServers })
 
         await ns.sleep(60000)
     }

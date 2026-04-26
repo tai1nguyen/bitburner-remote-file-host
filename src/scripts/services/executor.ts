@@ -142,8 +142,10 @@ export class Executor {
     }
 
     private ensureFilesAreCurrent = (host: string) => {
-        this.logger.info(`Updating files on ${host}.`)
-        new FileCopier(this.ns).copyScriptFiles(host)
+        if (!host.includes('home')) {
+            this.logger.info(`Updating files on ${host}.`)
+            new FileCopier(this.ns).copyScriptFiles(host)
+        }
     }
 
     private getAction = (action: string): ExecutorAction =>

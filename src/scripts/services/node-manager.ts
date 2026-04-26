@@ -1,6 +1,7 @@
 import { NS } from '@ns'
 import { Logger } from '/scripts/utils/logger'
 import { Executor } from './executor'
+import { NodeProvider } from './node-provider'
 import _ from '/scripts/utils/helpers'
 
 /**
@@ -12,23 +13,53 @@ export class NodeManager {
     private ns: NS
     private logger: Logger
     private executor: Executor
+    private nodeProvider: NodeProvider
     private workerNodes: string[] = []
     private currentTarget?: string = undefined
+    private nodePrefix: string = 'node'
 
     constructor(ns: NS) {
         this.executor = new Executor(ns)
+        this.nodeProvider = new NodeProvider(ns)
         this.logger = new Logger(ns, 'NodeManager')
         this.ns = ns
     }
 
     public processUpdates = async (target: string, servers: string[]) => {
-        const isNewTarget =
-            target !== undefined && target !== this.currentTarget
-        const newNodes = _.difference(this.getNodes(servers), this.workerNodes)
-        const nodeTarget = isNewTarget ? target : this.currentTarget
-
         this.logger.info('Processing updates...')
 
+        const isNewTarget =
+            target !== undefined && target !== this.currentTarget
+        const nodes: string[] = this.nodeProvider.getNodes(
+            this.workerNodes,
+            servers
+        )
+        const isWorkerNodesAvailable = !!nodes.find((host) =>
+            host.includes(this.nodePrefix)
+        )
+        const isUsingNetworkHosts = !!this.workerNodes.find(
+            (host) => !host.includes(this.nodePrefix)
+        )
+
+        if (isWorkerNodesAvailable && isUsingNetworkHosts) {
+            // Kill existing host nodes and empty the list
+            // to prepare for using worker nodes.
+            this.stopNodeProcesses(this.workerNodes)
+            this.workerNodes = []
+        }
+
+        const newNodes = _.difference(nodes, this.workerNodes)
+        const nodeTarget = isNewTarget ? target : this.currentTarget
+
+        if (_.isEmpty(newNodes) && !isUsingNetworkHosts) {
+            // attempt to upgrade existing nodes.
+            const upgradeNodes = this.nodeProvider.upgradeNodes(
+                this.workerNodes
+            )
+            await this.startNodeProcesses(upgradeNodes, nodeTarget!)
+        }
+
+        // point all existing nodes to the new target.
         if (isNewTarget) {
             this.logger.info(`Forcing nodes to use target: ${nodeTarget}`)
             this.logger.info(`Old target was ${this.currentTarget}`)
@@ -37,6 +68,7 @@ export class NodeManager {
             this.handleHomeProcesses(nodeTarget!)
         }
 
+        // calibrate new nodes to new target.
         if (newNodes.length > 0 && nodeTarget) {
             this.logger.info('Adding nodes to network...')
             this.logger.info(
@@ -47,7 +79,7 @@ export class NodeManager {
         }
 
         this.currentTarget = nodeTarget
-        this.logger.info('Calibration complete.')
+        this.logger.info('Finished processing updates.')
     }
 
     private handleHomeProcesses = (target: string) => {
@@ -82,34 +114,5 @@ export class NodeManager {
             this.logger.info(`Killing processes on ${host}.`)
             this.ns.killall(host)
         })
-    }
-
-    private getNodes = (servers: string[]) => {
-        const nodeSuspects: string[] = []
-        const isNode = (host: string) => host.includes('node')
-        const hasNodes = (hosts: string[]) => !!hosts.find(isNode)
-
-        this.logger.info('Getting worker nodes...')
-
-        servers.forEach((host) => nodeSuspects.push(host))
-
-        const nodes = hasNodes(nodeSuspects)
-            ? nodeSuspects.filter(isNode)
-            : nodeSuspects
-
-        return nodes
-            .map((host) => {
-                const server = this.ns.getServer(host)
-                const ramCost = this.ns.getScriptRam(
-                    '/scripts/harvest-target.js'
-                )
-
-                if (ramCost <= server.maxRam) {
-                    return host
-                }
-
-                return null
-            })
-            .filter((host) => host !== null)
     }
 }

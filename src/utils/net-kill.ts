@@ -14,6 +14,7 @@ export const main = async (ns: NS) => {
     const killAllProcesses = (host: string) => {
         logger.info(`Killing processes on ${host}.`)
         ns.killall(host)
+        ns.deleteServer(host)
         return true
     }
 

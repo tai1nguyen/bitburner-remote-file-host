@@ -12,7 +12,7 @@ import { NodeManager } from '/scripts/services/node-manager'
 export const main = async (ns: NS) => {
     logExeInfo(ns)
     const logger = new Logger(ns)
-    const harvesterQueue = ns.getPortHandle(1)
+    const WormUpdates = ns.getPortHandle(1)
     const nodeManager = new NodeManager(ns)
 
     const isMessage = (
@@ -23,9 +23,9 @@ export const main = async (ns: NS) => {
         message.servers !== undefined
 
     while (true) {
-        ns.clearLog()
+        // ns.clearLog()
         const message: { target: string; servers: string[] } =
-            harvesterQueue.read()
+            WormUpdates.read()
 
         if (isMessage(message)) {
             logger.info(`Handling updates from Worm...`)
