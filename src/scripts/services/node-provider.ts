@@ -25,7 +25,7 @@ export class NodeProvider {
      * Takes an array of nodes and will attempt to upgrade them all to the same ram
      * level. If all nodes are on the same ram level it will attempt to upgrade all
      * nodes to the next greatest ram level that is affordable.
-     *
+     * 
      * @param currentNodes
      * @returns Returns an array of nodes that have been updated.
      */

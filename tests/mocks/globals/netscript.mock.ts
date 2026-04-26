@@ -10,6 +10,11 @@ export const Netscript = {
     sqlinject: vi.fn(),
     nuke: vi.fn(),
 
+    // grow/hack/weaken
+    grow: vi.fn(),
+    hack: vi.fn(),
+    weaken: vi.fn(),
+
     disableLog: vi.fn(),
     getHostname: vi.fn().mockReturnValue('host'),
     getScriptName: vi.fn().mockReturnValue('path/to/script.js'),

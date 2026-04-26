@@ -9,6 +9,13 @@ const difference = <T>(array: T[], values: T[]): T[] => {
     return array.filter((item) => !values.includes(item))
 }
 
+/**
+ * Takes a value and returns true or false depending on whether or
+ * not the value is empty. Treats primitive numbers as being empty.
+ *
+ * @param value
+ * @returns Returns a boolean. True if value is empty, false otherwise.
+ */
 const isEmpty = <T>(value: T): boolean => {
     if (value === null) return true
     if (value === undefined) return true
