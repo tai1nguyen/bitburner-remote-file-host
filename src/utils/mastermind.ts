@@ -4,7 +4,7 @@ import { Logger } from '/scripts/utils/logger'
 import { NodeManager } from '/scripts/services/node-manager'
 
 /**
- * This script will read from the harvestQueue to determine what host to target.
+ * This script will read from the WormUpdates queue to determine what host to target.
  * It will then batch grow/weaken/hack attacks against that host using its nodes.
  * If no nodes are present on the network it will default to using other servers
  * on the network as nodes.
@@ -23,7 +23,7 @@ export const main = async (ns: NS) => {
         message.servers !== undefined
 
     while (true) {
-        // ns.clearLog()
+        ns.clearLog()
         const message: { target: string; servers: string[] } =
             WormUpdates.read()
 

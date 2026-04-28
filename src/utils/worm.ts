@@ -1,10 +1,9 @@
-import { NS } from '@ns'
+import { NS, Server } from '@ns'
 import { logExeInfo } from '/scripts/utils/log-exe-info'
 import { Logger } from '/scripts/utils/logger'
 import { WebCrawler } from '../scripts/services/web-crawler'
 import { Accessor } from '/scripts/services/accessor'
 import { FileCopier } from '/scripts/services/file-copier'
-import { getBestTarget } from '/scripts/utils/get-best-target'
 
 /**
  * This script will periodically crawl the network and attempt to
@@ -36,6 +35,26 @@ export const main = async (ns: NS) => {
 
             return false
         }
+    }
+
+    const getBestTarget = (listOfServers: Set<string>, ns: NS): string => {
+        const servers: Server[] = []
+
+        listOfServers.forEach((host) => {
+            servers.push(ns.getServer(host))
+        })
+
+        const largestServer = servers.reduce((prev, curr) => {
+            const prevServerMaxMoney = prev.moneyMax || 0
+            const currServerMaxMoney = curr.moneyMax || 0
+
+            const prevHasMoreTotalMoney =
+                prevServerMaxMoney >= currServerMaxMoney
+
+            return prevHasMoreTotalMoney ? prev : curr
+        })
+
+        return largestServer.hostname
     }
 
     while (true) {

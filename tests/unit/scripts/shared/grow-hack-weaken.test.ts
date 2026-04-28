@@ -32,13 +32,13 @@ describe('growHackWeaken()', () => {
         expect(Mock.Netscript.hack).toHaveBeenCalledWith('target')
     })
 
-    it('should weaken the target', async () => {
+    it('should weaken the target when it is above target levels', async () => {
         Mock.Netscript.getServer.mockReturnValue({
             hostname: 'target',
             moneyMax: 100,
             moneyAvailable: 20,
             hackDifficulty: 50,
-            minDifficulty: 50
+            minDifficulty: 10
         })
 
         await growHackWeaken(Mock.Netscript as unknown as NS, 'target')

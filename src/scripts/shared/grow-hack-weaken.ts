@@ -13,8 +13,10 @@ export const growHackWeaken = async (ns: NS, target: string) => {
     const thresholder: ThresholdCalculator = new ThresholdCalculator(server)
     const logger: Logger = new Logger(ns)
 
-    logger.info(`Weakening [${target}]...`)
-    await ns.weaken(target)
+    if (!thresholder.isAtSecurityThreshold()) {
+        logger.info(`Weakening [${target}]...`)
+        await ns.weaken(target)
+    }
 
     if (!thresholder.isAtMoneyThreshold()) {
         logger.info(`Growing [${target}]...`)
@@ -30,4 +32,6 @@ export const growHackWeaken = async (ns: NS, target: string) => {
         logger.info(`Harvesting [${target}]...`)
         await ns.hack(target)
     }
+
+    await ns.sleep(1000)
 }

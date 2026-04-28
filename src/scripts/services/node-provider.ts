@@ -22,10 +22,36 @@ export class NodeProvider {
     }
 
     /**
+     * Gets worker nodes. If nodes (cloud servers) are purchasable, it will
+     * return a list of nodes that has been bought. Otherwise, return a
+     * list of network hosts that are able to run the harvest script.
+     *
+     * @param currentNodes
+     * @param servers
+     * @returns Returns an array of worker nodes or network hosts.
+     */
+    public getNodes = (currentNodes: string[], servers: string[]): string[] => {
+        const isAbleToBuyNodes = this.getMaxPurchasableRam() > 0
+        const isUsingWorkerNodes = this.isUsingWorkerNodes(currentNodes)
+
+        if (isAbleToBuyNodes || isUsingWorkerNodes) {
+            const existingNodes = servers
+                .concat(currentNodes)
+                .filter((host) => host.includes(this.nodeNamePrefix))
+
+            const listOfUniqueNodes = Array.from(new Set(existingNodes))
+
+            return this.getWorkerNodes(listOfUniqueNodes)
+        } else {
+            return this.getNetworkNodes(servers)
+        }
+    }
+
+    /**
      * Takes an array of nodes and will attempt to upgrade them all to the same ram
      * level. If all nodes are on the same ram level it will attempt to upgrade all
      * nodes to the next greatest ram level that is affordable.
-     * 
+     *
      * @param currentNodes
      * @returns Returns an array of nodes that have been updated.
      */
@@ -79,32 +105,6 @@ export class NodeProvider {
         return upgradedNodes
     }
 
-    /**
-     * Gets worker nodes. If nodes (cloud servers) are purchasable, it will
-     * return a list of nodes that has been bought. Otherwise, return a
-     * list of network hosts that are able to run the harvest script.
-     *
-     * @param currentNodes
-     * @param servers
-     * @returns Returns an array of worker nodes or network hosts.
-     */
-    public getNodes = (currentNodes: string[], servers: string[]): string[] => {
-        const isAbleToBuyNodes = this.getMaxPurchasableRam() > 0
-        const isUsingWorkerNodes = this.isUsingWorkerNodes(currentNodes)
-
-        if (isAbleToBuyNodes || isUsingWorkerNodes) {
-            const existingNodes = servers
-                .concat(currentNodes)
-                .filter((host) => host.includes(this.nodeNamePrefix))
-
-            const listOfUniqueNodes = Array.from(new Set(existingNodes))
-
-            return this.getWorkerNodes(listOfUniqueNodes)
-        } else {
-            return this.getNetworkNodes(servers)
-        }
-    }
-
     private getWorkerNodes = (currentNodes: string[]) => {
         this.logger.info('Getting worker nodes...')
         const serverLimit = this.ns.getPurchasedServerLimit()
@@ -116,15 +116,11 @@ export class NodeProvider {
         const listOfNodes: string[] = []
         const maxPurchasableRam = this.getMaxPurchasableRam()
         const greatestRamValue = this.getGreatestRamValue(currentNodes)
-        const isUsingNetworkHosts = !!currentNodes.find(
-            (host) => !host.includes(this.nodeNamePrefix)
-        )
 
         // If we have no current nodes then use max purchasable ram
-        const nodeTargetRam =
-            isUsingNetworkHosts || _.isEmpty(currentNodes)
-                ? maxPurchasableRam
-                : greatestRamValue
+        const nodeTargetRam = _.isEmpty(currentNodes)
+            ? maxPurchasableRam
+            : greatestRamValue
 
         while (listOfNodes.length < serverLimit) {
             const node = this.ns.purchaseServer(
