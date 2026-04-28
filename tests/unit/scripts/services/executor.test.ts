@@ -119,11 +119,17 @@ describe('Executor', () => {
                 ramUsed: 1
             })
 
-            expect(() => executor.growTarget({ host: 'host', target: 'target' })).toThrow()
+            expect(() =>
+                executor.growTarget({ host: 'host', target: 'target' })
+            ).toThrow()
         })
 
         it('should return the pid', () => {
-            const result = executor.growTarget({ host: 'host', target: 'target', threads: 1 })
+            const result = executor.growTarget({
+                host: 'host',
+                target: 'target',
+                threads: 1
+            })
 
             expect(result).toBe(1)
         })
@@ -131,7 +137,11 @@ describe('Executor', () => {
 
     describe('harvestTarget()', () => {
         it('should execute the grow script', () => {
-            executor.harvestTarget({ host: 'host', target: 'target', threads: 1 })
+            executor.harvestTarget({
+                host: 'host',
+                target: 'target',
+                threads: 1
+            })
 
             expect(Mock.Netscript.exec).toHaveBeenCalledWith(
                 '/scripts/harvest-target.js',
@@ -160,13 +170,31 @@ describe('Executor', () => {
                 ramUsed: 1
             })
 
-            expect(() => executor.harvestTarget({ host: 'host', target: 'target' })).toThrow()
+            expect(() =>
+                executor.harvestTarget({ host: 'host', target: 'target' })
+            ).toThrow()
         })
 
         it('should return the pid', () => {
-            const result = executor.harvestTarget({ host: 'host', target: 'target', threads: 1 })
+            const result = executor.harvestTarget({
+                host: 'host',
+                target: 'target',
+                threads: 1
+            })
 
             expect(result).toBe(1)
+        })
+
+        it('should not copy files onto home', () => {
+            Mock.Netscript.getServer.mockReturnValue({
+                hostname: 'home',
+                maxRam: 1,
+                ramUsed: 1
+            })
+
+            executor.harvestTarget({ host: 'home', threads: 1 })
+
+            expect(Mock.FileCopier.copyScriptFiles).not.toHaveBeenCalled()
         })
     })
 })

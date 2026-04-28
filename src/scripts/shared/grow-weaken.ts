@@ -4,7 +4,10 @@ import { Logger } from '/scripts/utils/logger'
 
 /**
  * Executes grow and weaken to increase the target
- * host money levels without raising security.
+ * host money without raising security.
+ *
+ * @params ns
+ * @params target
  */
 export const growWeaken = async (ns: NS, target: string) => {
     const server: Server = ns.getServer(target)

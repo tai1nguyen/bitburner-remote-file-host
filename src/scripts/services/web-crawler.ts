@@ -13,10 +13,8 @@ export class WebCrawler {
     private count?: number
 
     /**
-     * The WebCrawler scans the network and attempts
-     * to infect as many servers as possible.
-     *
-     * @param ns
+     * The WebCrawler scans the entire network and will execute
+     * the handler when it finds a valid target.
      */
     constructor(
         ns: NS,
@@ -40,6 +38,10 @@ export class WebCrawler {
         }
     }
 
+    /**
+     * Start scanning the network. Will continue scanning
+     * the network until it has reached every server.
+     */
     public start = async (): Promise<void> => {
         this.logger.info('Crawling the network...')
 
@@ -98,6 +100,15 @@ export class WebCrawler {
         }
     }
 
+    /**
+     * Gets the list of servers that have met the search
+     * predicate and have been successfully acted on by
+     * the handler.
+     *
+     * @returns Returns the list of servers meet the
+     * search predicate and that have been successfully
+     * acted on by the handler.
+     */
     public getServers = () => this.listOfServers
 
     public logToTerminal = (toTerminal: boolean) =>

@@ -34,7 +34,8 @@ export const main = async (ns: NS) => {
 
     const getServerSecurity = (server: Server) => {
         const baseSecurity = server.baseDifficulty
-        const currentSecurity = Math.floor(server.hackDifficulty || 0)
+        const currentSecurity =
+            Math.round((server.hackDifficulty || 0) * 100) / 100
 
         return `Security Level: ${currentSecurity}/${baseSecurity} Min: ${server.minDifficulty}`
     }

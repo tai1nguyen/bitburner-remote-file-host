@@ -25,7 +25,7 @@ export class Executor {
      * server. It holds all the necessary logic to determine what scripts
      * to run and how to run them.
      *
-     * @param ns {NS}
+     * @param ns
      */
     constructor(ns: NS) {
         this.ns = ns
@@ -38,7 +38,7 @@ export class Executor {
      * This method takes an array of arguments and determines what actions to execute.
      * It will then call the corresponding method with the correct options.
      *
-     * @param args {RunArgs[]}
+     * @param args
      */
     public run = (args: RunArgs) => {
         const host = args[0]
@@ -142,8 +142,10 @@ export class Executor {
     }
 
     private ensureFilesAreCurrent = (host: string) => {
-        this.logger.info(`Updating files on ${host}.`)
-        new FileCopier(this.ns).copyScriptFiles(host)
+        if (!host.includes('home')) {
+            this.logger.info(`Updating files on ${host}.`)
+            new FileCopier(this.ns).copyScriptFiles(host)
+        }
     }
 
     private getAction = (action: string): ExecutorAction =>

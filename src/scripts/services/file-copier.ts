@@ -8,11 +8,11 @@ export class FileCopier {
     private baseDirectory: string = 'scripts'
 
     /**
-     * The FileCopier is responsible for copying files from the host server to a target server. Currently
-     * it only copies the contents of /scripts.
+     * The FileCopier is responsible for copying files from the home
+     * server to a target server. Currently it only copies the
+     * contents of /scripts/.
      *
-     * @param ns {NS}
-     * @param target {string}
+     * @param ns
      */
     constructor(ns: NS) {
         this.ns = ns
@@ -22,6 +22,11 @@ export class FileCopier {
         ns.disableLog('ALL')
     }
 
+    /**
+     * Copy the contents of the /script directory on the home server to the target server.
+     *
+     * @param target
+     */
     public copyScriptFiles = (target: string) => {
         this.copyFilesInDirectory(this.baseDirectory, target)
     }

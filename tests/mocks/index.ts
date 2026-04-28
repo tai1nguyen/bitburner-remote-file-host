@@ -5,6 +5,7 @@ import { Infector } from './scripts/services/infector.mock'
 import { FileCopier } from './scripts/services/file-copier.mock'
 import { WebCrawler } from './scripts/services/web-crawler.mock'
 import { Logger } from './scripts/utils/logger.mock'
+import { NodeProvider } from './scripts/services/node-provider.mock'
 
 export default {
     Netscript,
@@ -13,5 +14,6 @@ export default {
     Infector,
     FileCopier,
     WebCrawler,
-    Logger
+    Logger,
+    NodeProvider
 }
