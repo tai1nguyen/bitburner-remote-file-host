@@ -14,18 +14,16 @@ export const main = async (ns: NS) => {
     const logger = new Logger(ns)
     const WormUpdates = ns.getPortHandle(1)
     const nodeManager = new NodeManager(ns)
+    type QueueMessage = { target: string; servers: string[] }
 
-    const isMessage = (
-        message: { target: string; servers: string[] } | string
-    ) =>
+    const isMessage = (message: QueueMessage | string) =>
         typeof message !== 'string' &&
         message.target !== undefined &&
         message.servers !== undefined
 
     while (true) {
         ns.clearLog()
-        const message: { target: string; servers: string[] } =
-            WormUpdates.read()
+        const message: QueueMessage = WormUpdates.read()
 
         if (isMessage(message)) {
             logger.info(`Handling updates from Worm...`)

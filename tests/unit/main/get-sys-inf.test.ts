@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import Mock from '/mocks'
-import * as getSysInf from '/utils/get-sys-inf'
+import * as getSysInf from '/main/get-sys-inf'
 import { NS } from '@ns'
 
 describe('get-sys-inf', () => {
