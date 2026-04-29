@@ -40,5 +40,7 @@ export const Netscript = {
     exec: vi.fn(),
     getScriptRam: vi.fn(),
     scan: vi.fn(),
-    scriptKill: vi.fn()
+    scriptKill: vi.fn(),
+    hasRootAccess: vi.fn(),
+    getPortHandle: vi.fn()
 }
