@@ -6,6 +6,7 @@ import { FileCopier } from './scripts/services/file-copier.mock'
 import { WebCrawler } from './scripts/services/web-crawler.mock'
 import { Logger } from './scripts/utils/logger.mock'
 import { NodeProvider } from './scripts/services/node-provider.mock'
+import { NodeManager } from './scripts/services/node-manager.mock'
 
 export default {
     Netscript,
@@ -15,5 +16,6 @@ export default {
     FileCopier,
     WebCrawler,
     Logger,
-    NodeProvider
+    NodeProvider,
+    NodeManager
 }

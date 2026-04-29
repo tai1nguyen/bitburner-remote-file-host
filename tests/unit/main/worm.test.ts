@@ -7,7 +7,7 @@ vi.mock('/scripts/services/accessor', () => Mock.Accessor)
 vi.mock('/scripts/services/file-copier', () => Mock.FileCopier)
 vi.mock('/scripts/services/web-crawler', () => Mock.WebCrawler)
 
-describe('Worm', () => {
+describe('worm', () => {
     const mockPort = { write: vi.fn() }
 
     beforeEach(() => {

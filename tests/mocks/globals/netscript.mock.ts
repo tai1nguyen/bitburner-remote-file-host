@@ -24,6 +24,8 @@ export const Netscript = {
     upgradePurchasedServer: vi.fn(),
     purchaseServer: vi.fn(),
 
+    ui: { openTail: vi.fn(), resizeTail: vi.fn() },
+
     disableLog: vi.fn(),
     getHostname: vi.fn().mockReturnValue('host'),
     getScriptName: vi.fn().mockReturnValue('path/to/script.js'),
@@ -42,5 +44,11 @@ export const Netscript = {
     scan: vi.fn(),
     scriptKill: vi.fn(),
     hasRootAccess: vi.fn(),
-    getPortHandle: vi.fn()
+    getPortHandle: vi.fn(),
+    formatNumber: vi.fn(),
+    getHackTime: vi.fn(),
+    getGrowTime: vi.fn(),
+    getWeakenTime: vi.fn(),
+    formatPercent: vi.fn(),
+    hackAnalyzeChance: vi.fn()
 }
