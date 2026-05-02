@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import Mock from '/mocks'
-import * as netKill from '/utils/net-kill'
+import * as netKill from '/main/net-kill'
 import { NS } from '@ns'
 
 vi.mock('/scripts/services/web-crawler', () => Mock.WebCrawler)

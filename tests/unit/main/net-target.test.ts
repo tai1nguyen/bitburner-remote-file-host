@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import Mock from '/mocks'
-import * as netTarget from '/utils/net-target'
+import * as netTarget from '/main/net-target'
 import { NS } from '@ns'
 
 vi.mock('/scripts/services/executor', () => Mock.Executor)
